@@ -2,569 +2,826 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+>
+
 <meta name="theme-color" content="#050a12">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta
+  name="apple-mobile-web-app-status-bar-style"
+  content="black-translucent"
+>
 
-<title>Zoony607 Mixer</title>
+<title>Zoony607 Playlist Mixer</title>
+
+<!-- MP3 encoder -->
+<script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
 
 <style>
 :root {
-  --bg:#050a12;
-  --panel:#0b1422;
-  --panel2:#101d30;
-  --text:#f5f7fb;
-  --muted:#9ca9bb;
-  --blue:#1ea7ff;
-  --orange:#ff7417;
-  --line:rgba(255,255,255,.10);
+  --bg: #050a12;
+  --panel: #0b1422;
+  --panel2: #101d30;
+  --text: #f5f7fb;
+  --muted: #9ca9bb;
+  --blue: #1ea7ff;
+  --orange: #ff7417;
+  --green: #19c75a;
+  --danger: #ff4c5e;
+  --line: rgba(255,255,255,.10);
 }
 
 * {
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
-html,body {
-  margin:0;
-  min-height:100%;
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  color: var(--text);
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+
   background:
-    radial-gradient(circle at 20% 0%,rgba(30,167,255,.15),transparent 35%),
-    radial-gradient(circle at 80% 0%,rgba(255,116,23,.13),transparent 35%),
+    radial-gradient(
+      circle at 20% 0%,
+      rgba(30,167,255,.15),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 80% 0%,
+      rgba(255,116,23,.13),
+      transparent 34%
+    ),
     var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
 }
 
 body {
   padding:
-    max(18px,env(safe-area-inset-top))
+    max(18px, env(safe-area-inset-top))
     14px
-    max(25px,env(safe-area-inset-bottom));
+    max(28px, env(safe-area-inset-bottom));
 }
 
 .app {
-  width:min(960px,100%);
-  margin:auto;
+  width: min(900px, 100%);
+  margin: 0 auto;
 }
 
-/* LOGO */
+/* =========================
+   LOGO
+========================= */
 
 .brand {
-  text-align:center;
-  margin-bottom:18px;
+  text-align: center;
+  margin-bottom: 16px;
 }
 
 .brand a {
-  display:inline-block;
+  display: inline-block;
 }
 
 .brand img {
-  width:min(320px,84vw);
-  height:auto;
-  display:block;
-  margin:auto;
-  border-radius:50%;
+  width: min(260px, 70vw);
+  height: auto;
+  display: block;
+  margin: auto;
+
+  border-radius: 50%;
+
   box-shadow:
-    0 0 30px rgba(30,167,255,.15),
-    0 0 30px rgba(255,116,23,.12),
-    0 15px 40px rgba(0,0,0,.5);
+    0 0 32px rgba(30,167,255,.12),
+    0 0 32px rgba(255,116,23,.10),
+    0 16px 44px rgba(0,0,0,.48);
 }
 
 .brand img:active {
-  transform:scale(.98);
+  transform: scale(.98);
 }
 
 .brand-note {
-  margin-top:8px;
-  color:var(--muted);
-  font-size:.85rem;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: .86rem;
 }
 
-/* PANELS */
+/* =========================
+   PANELS
+========================= */
 
 .panel {
-  background:linear-gradient(180deg,var(--panel2),var(--panel));
-  border:1px solid var(--line);
-  border-radius:22px;
-  padding:16px;
-  margin-bottom:16px;
-  box-shadow:0 18px 50px rgba(0,0,0,.35);
+  margin-bottom: 15px;
+  padding: 16px;
+
+  border: 1px solid var(--line);
+  border-radius: 22px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(16,29,48,.97),
+      rgba(8,17,29,.97)
+    );
+
+  box-shadow:
+    0 18px 50px rgba(0,0,0,.32);
 }
 
-/* LOAD MUSIC */
-
-.load-btn {
-  width:100%;
-  min-height:56px;
-  border:0;
-  border-radius:16px;
-  color:white;
-  font-size:1.05rem;
-  font-weight:800;
-  cursor:pointer;
-  background:linear-gradient(90deg,var(--blue),var(--orange));
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
 }
 
-.load-btn:active {
-  transform:scale(.985);
+h1 {
+  font-size: 1.42rem;
+  margin-bottom: 5px;
 }
 
-.status {
-  margin-top:10px;
-  min-height:22px;
-  text-align:center;
-  color:var(--muted);
-  font-size:.9rem;
-  overflow-wrap:anywhere;
+h2 {
+  margin-bottom: 10px;
 }
 
-/* DECKS */
-
-.deck-grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
+.subtitle {
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.45;
+  font-size: .9rem;
 }
 
-.deck {
-  background:linear-gradient(180deg,var(--panel2),var(--panel));
-  border:1px solid var(--line);
-  border-radius:22px;
-  padding:16px;
-  min-width:0;
-}
+/* =========================
+   BUTTONS
+========================= */
 
-.deck h2 {
-  margin:0 0 12px;
-}
-
-.deck-a h2 {
-  color:var(--blue);
-}
-
-.deck-b h2 {
-  color:var(--orange);
-}
-
-.track-name {
-  min-height:46px;
-  padding:10px;
-  border-radius:12px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.03);
-  color:#dce5f0;
-  overflow-wrap:anywhere;
-  font-size:.9rem;
-}
-
-.time-row {
-  display:flex;
-  justify-content:space-between;
-  margin:10px 1px 6px;
-  color:var(--muted);
-  font-size:.78rem;
-}
-
-input[type="range"] {
-  width:100%;
-  accent-color:var(--blue);
-}
-
-.deck-b input[type="range"] {
-  accent-color:var(--orange);
-}
-
-.controls {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:14px;
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 .btn {
-  min-height:46px;
-  border-radius:13px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.06);
-  color:white;
-  font-size:.95rem;
-  font-weight:750;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+
+  min-height: 52px;
+  padding: 10px 14px;
+
+  color: white;
+  background: rgba(255,255,255,.055);
+
+  font-size: .95rem;
+  font-weight: 800;
+
+  cursor: pointer;
 }
 
 .btn:active {
-  transform:scale(.98);
+  transform: scale(.985);
 }
 
-.primary-a {
-  background:rgba(30,167,255,.16);
+.btn:disabled {
+  opacity: .42;
+  cursor: default;
 }
 
-.primary-b {
-  background:rgba(255,116,23,.16);
+.primary {
+  border: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--blue),
+      var(--orange)
+    );
+}
+
+.green {
+  background:
+    linear-gradient(
+      90deg,
+      #087f2c,
+      var(--green)
+    );
+}
+
+.red {
+  background: rgba(255,76,94,.12);
+  border-color: rgba(255,76,94,.28);
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.status {
+  margin-top: 11px;
+  padding: 10px 12px;
+
+  border: 1px solid var(--line);
+  border-radius: 13px;
+
+  color: var(--muted);
+
+  font-size: .87rem;
+
+  min-height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* =========================
+   PLAYLIST
+========================= */
+
+.track-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.track {
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.035);
+
+  border-radius: 15px;
+  padding: 11px;
+}
+
+.track-top {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.track-number {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 9px;
+
+  font-size: .8rem;
+  font-weight: 900;
+
+  background: rgba(30,167,255,.12);
+  color: var(--blue);
+}
+
+.track-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.track-name {
+  font-weight: 800;
+  overflow-wrap: anywhere;
+  font-size: .91rem;
+}
+
+.track-meta {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: .78rem;
+}
+
+.track-buttons {
+  display: flex;
+  gap: 6px;
+  margin-top: 9px;
+}
+
+.mini {
+  flex: 1;
+
+  border: 1px solid var(--line);
+
+  background:
+    rgba(255,255,255,.045);
+
+  color: white;
+
+  border-radius: 10px;
+
+  min-height: 38px;
+
+  font-weight: 800;
+}
+
+.mini:disabled {
+  opacity: .35;
+}
+
+.mini.remove {
+  color: #ff9aa5;
+}
+
+/* =========================
+   SLIDERS
+========================= */
+
+.control-row {
+  margin-top: 16px;
 }
 
 .label-row {
-  display:flex;
-  justify-content:space-between;
-  margin-top:14px;
-  margin-bottom:7px;
-  color:#d5deea;
-  font-size:.86rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+
+  margin-bottom: 7px;
 }
 
-/* CROSSFADER */
-
-.cross-labels {
-  display:flex;
-  justify-content:space-between;
-  color:var(--muted);
-  font-size:.8rem;
+.label-row span:first-child {
+  font-weight: 800;
 }
 
-.mixer-title {
-  text-align:center;
-  margin-top:0;
+.label-row span:last-child {
+  color: var(--muted);
 }
 
-.mixer-buttons {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:14px;
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--blue);
 }
 
-/* SUPPORT */
+/* =========================
+   PREVIEW
+========================= */
+
+.now-playing {
+  margin-top: 12px;
+
+  color: var(--muted);
+
+  font-size: .86rem;
+
+  min-height: 22px;
+
+  overflow-wrap: anywhere;
+}
+
+/* =========================
+   EXPORT
+========================= */
+
+.export-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+
+  margin-top: 12px;
+}
+
+.progress {
+  width: 100%;
+  height: 11px;
+
+  border-radius: 999px;
+
+  overflow: hidden;
+
+  border: 1px solid var(--line);
+
+  background: #07101d;
+
+  margin-top: 14px;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--blue),
+      var(--orange)
+    );
+}
+
+.note {
+  margin-top: 12px;
+
+  color: var(--muted);
+
+  font-size: .78rem;
+  line-height: 1.5;
+}
+
+/* =========================
+   SUPPORT
+========================= */
 
 .support {
-  text-align:center;
-}
-
-.support h2 {
-  margin-top:0;
-  margin-bottom:7px;
-}
-
-.support p {
-  color:var(--muted);
-  font-size:.9rem;
-  line-height:1.45;
+  text-align: center;
 }
 
 .support-links {
-  display:grid;
-  gap:10px;
-  margin-top:15px;
+  display: grid;
+  gap: 10px;
+
+  margin-top: 13px;
 }
 
 .support-link {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:54px;
-  padding:12px 16px;
-  border-radius:15px;
-  color:white;
-  text-decoration:none;
-  font-weight:800;
+  min-height: 52px;
+
+  padding: 12px 14px;
+
+  border-radius: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-decoration: none;
+
+  color: white;
+
+  font-weight: 850;
 }
 
-.youtube-link {
-  background:linear-gradient(90deg,#b90000,#ff2020);
+.youtube {
+  background:
+    linear-gradient(
+      90deg,
+      #b90000,
+      #ff2020
+    );
 }
 
-.cash-link {
-  background:linear-gradient(90deg,#087f2c,#00b847);
+.cash {
+  background:
+    linear-gradient(
+      90deg,
+      #087f2c,
+      #00b847
+    );
 }
 
-.support-link:active {
-  transform:scale(.985);
-}
+@media (max-width: 600px) {
 
-.cashtag {
-  margin-top:10px;
-  color:var(--muted);
-  font-size:.82rem;
-}
-
-@media(max-width:700px) {
-  .deck-grid {
-    grid-template-columns:1fr;
+  .actions,
+  .export-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>
 </head>
 
+
 <body>
 
 <main class="app">
 
-<!-- ZOONY607 LOGO -->
+
+<!-- =========================
+     ZOONY607 LOGO
+========================= -->
 
 <div class="brand">
 
-<a
-href="https://www.youtube.com/@ZooNY607"
-target="_blank"
-rel="noopener noreferrer"
->
+  <a
+    href="https://www.youtube.com/@ZooNY607"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
 
-<img
-src="zoony607-logo.png"
-alt="Zoony607"
->
+    <img
+      src="zoony607-logo.png"
+      alt="Zoony607"
+    >
 
-</a>
+  </a>
 
-<div class="brand-note">
-Tap the Zoony607 logo to visit my YouTube channel
+  <div class="brand-note">
+    Tap the Zoony607 logo to visit my YouTube channel
+  </div>
+
 </div>
 
-</div>
 
-
-<!-- LOAD MUSIC -->
+<!-- =========================
+     ADD SONGS
+========================= -->
 
 <section class="panel">
 
-<input
-id="files"
-type="file"
-accept="audio/*,.mp3,.wav,.m4a,.aac,.flac,.ogg"
-multiple
-hidden
->
+  <h1>
+    Zoony607 Playlist Mixer
+  </h1>
 
-<button
-id="loadMusicBtn"
-class="load-btn"
-type="button"
->
-🎵 Load Music
-</button>
+  <p class="subtitle">
+    Load up to 20 songs, arrange them,
+    automatically crossfade between tracks,
+    preview the full continuous mix,
+    and save the finished mix as MP3 or WAV.
+  </p>
 
-<div id="loadStatus" class="status">
-Tap Load Music and choose up to 2 songs
-</div>
+  <input
+    id="fileInput"
+    type="file"
+    accept="audio/*,.mp3,.m4a,.aac,.wav,.flac,.ogg"
+    multiple
+    hidden
+  >
+
+  <div class="actions">
+
+    <button
+      id="addBtn"
+      class="btn primary"
+      type="button"
+    >
+      🎵 Add Songs
+    </button>
+
+    <button
+      id="clearBtn"
+      class="btn red"
+      type="button"
+    >
+      Clear Playlist
+    </button>
+
+  </div>
+
+  <div
+    id="loadStatus"
+    class="status"
+  >
+    Choose 2–20 songs from Files.
+  </div>
 
 </section>
 
 
-<!-- DECKS -->
+<!-- =========================
+     PLAYLIST
+========================= -->
 
 <section class="panel">
 
-<div class="deck-grid">
+  <h2>
+    Playlist
+    <span
+      id="trackCount"
+      style="
+        color:var(--muted);
+        font-size:.85rem;
+      "
+    >
+      0 / 20
+    </span>
+  </h2>
 
-<!-- DECK A -->
-
-<div class="deck deck-a">
-
-<h2>Deck A</h2>
-
-<div id="nameA" class="track-name">
-No song loaded
-</div>
-
-<audio id="deckA" preload="metadata"></audio>
-
-<div class="time-row">
-<span id="timeA">0:00</span>
-<span id="durationA">0:00</span>
-</div>
-
-<input
-id="seekA"
-type="range"
-min="0"
-max="1000"
-value="0"
->
-
-<div class="controls">
-
-<button
-id="playA"
-class="btn primary-a"
-type="button"
->
-▶ Play
-</button>
-
-<button
-id="restartA"
-class="btn"
-type="button"
->
-↺ Restart
-</button>
-
-</div>
-
-<div class="label-row">
-<span>Deck Volume</span>
-<span id="volumeTextA">100%</span>
-</div>
-
-<input
-id="volumeA"
-type="range"
-min="0"
-max="100"
-value="100"
->
-
-</div>
-
-
-<!-- DECK B -->
-
-<div class="deck deck-b">
-
-<h2>Deck B</h2>
-
-<div id="nameB" class="track-name">
-No song loaded
-</div>
-
-<audio id="deckB" preload="metadata"></audio>
-
-<div class="time-row">
-<span id="timeB">0:00</span>
-<span id="durationB">0:00</span>
-</div>
-
-<input
-id="seekB"
-type="range"
-min="0"
-max="1000"
-value="0"
->
-
-<div class="controls">
-
-<button
-id="playB"
-class="btn primary-b"
-type="button"
->
-▶ Play
-</button>
-
-<button
-id="restartB"
-class="btn"
-type="button"
->
-↺ Restart
-</button>
-
-</div>
-
-<div class="label-row">
-<span>Deck Volume</span>
-<span id="volumeTextB">100%</span>
-</div>
-
-<input
-id="volumeB"
-type="range"
-min="0"
-max="100"
-value="100"
->
-
-</div>
-
-</div>
+  <div
+    id="trackList"
+    class="track-list"
+  >
+    <div class="status">
+      No songs loaded yet.
+    </div>
+  </div>
 
 </section>
 
 
-<!-- CROSSFADER -->
+<!-- =========================
+     MIX SETTINGS
+========================= -->
 
 <section class="panel">
 
-<h2 class="mixer-title">
-Crossfader
-</h2>
+  <h2>
+    Mix Settings
+  </h2>
 
-<div class="cross-labels">
-<span>Deck A</span>
-<span>Center</span>
-<span>Deck B</span>
-</div>
+  <div class="control-row">
 
-<input
-id="crossfader"
-type="range"
-min="-100"
-max="100"
-value="0"
->
+    <div class="label-row">
+      <span>Crossfade</span>
+      <span id="crossfadeValue">
+        8 seconds
+      </span>
+    </div>
 
-<div class="mixer-buttons">
+    <input
+      id="crossfade"
+      type="range"
+      min="0"
+      max="15"
+      step="1"
+      value="8"
+    >
 
-<button
-id="playBoth"
-class="btn"
-type="button"
->
-▶ Play Both
-</button>
+  </div>
 
-<button
-id="stopAll"
-class="btn"
-type="button"
->
-■ Stop All
-</button>
 
-</div>
+  <div class="control-row">
+
+    <div class="label-row">
+      <span>Master Level</span>
+      <span id="masterValue">
+        90%
+      </span>
+    </div>
+
+    <input
+      id="master"
+      type="range"
+      min="20"
+      max="100"
+      step="1"
+      value="90"
+    >
+
+  </div>
 
 </section>
 
 
-<!-- SUPPORT -->
+<!-- =========================
+     PREVIEW
+========================= -->
+
+<section class="panel">
+
+  <h2>
+    Preview Continuous Mix
+  </h2>
+
+  <div class="actions">
+
+    <button
+      id="previewBtn"
+      class="btn primary"
+      type="button"
+      disabled
+    >
+      ▶ Preview Mix
+    </button>
+
+    <button
+      id="stopBtn"
+      class="btn"
+      type="button"
+      disabled
+    >
+      ■ Stop
+    </button>
+
+  </div>
+
+  <div
+    id="nowPlaying"
+    class="now-playing"
+  >
+    Add at least 2 songs to begin.
+  </div>
+
+</section>
+
+
+<!-- =========================
+     EXPORT
+========================= -->
+
+<section class="panel">
+
+  <h2>
+    Export Finished Mix
+  </h2>
+
+  <p class="subtitle">
+    The app renders your playlist in order
+    and blends each song using your selected
+    crossfade time.
+  </p>
+
+  <div class="export-grid">
+
+    <button
+      id="wavBtn"
+      class="btn green"
+      type="button"
+      disabled
+    >
+      ⬇ Save WAV
+    </button>
+
+    <button
+      id="mp3Btn"
+      class="btn green"
+      type="button"
+      disabled
+    >
+      ⬇ Save MP3
+    </button>
+
+  </div>
+
+  <div class="progress">
+
+    <div
+      id="progressBar"
+      class="progress-bar"
+    ></div>
+
+  </div>
+
+  <div
+    id="exportStatus"
+    class="status"
+  >
+    Ready when at least 2 songs are loaded.
+  </div>
+
+  <div class="note">
+
+    MP3 export uses 192 kbps.
+
+    Long mixes can require a lot of iPhone
+    memory while rendering.
+
+    MP3 is recommended for large 10–20 song
+    mixes because the final file is much
+    smaller than WAV.
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     SUPPORT
+========================= -->
 
 <section class="panel support">
 
-<h2>Support Zoony607 ❤️</h2>
+  <h2>
+    Support Zoony607 ❤️
+  </h2>
 
-<p>
-Enjoy the music? Subscribe to my YouTube channel or help support Zoony607 with a cup of coffee.
-</p>
+  <p class="subtitle">
 
-<div class="support-links">
+    Enjoying the mixer and music?
 
-<a
-class="support-link youtube-link"
-href="https://www.youtube.com/@ZooNY607?sub_confirmation=1"
-target="_blank"
-rel="noopener noreferrer"
->
-❤️ Subscribe to Zoony607 on YouTube
-</a>
+    Subscribe on YouTube or help support
+    Zoony607 with a cup of coffee.
 
-<a
-class="support-link cash-link"
-href="https://cash.app/$Dchan99"
-target="_blank"
-rel="noopener noreferrer"
->
-☕ Buy Me a Cup of Coffee — Cash App
-</a>
+  </p>
 
-</div>
+  <div class="support-links">
 
-<div class="cashtag">
-Cash App: $Dchan99
-</div>
+    <a
+      class="support-link youtube"
+      href="https://www.youtube.com/@ZooNY607?sub_confirmation=1"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      ❤️ Subscribe to Zoony607 on YouTube
+    </a>
+
+
+    <a
+      class="support-link cash"
+      href="https://cash.app/$Dchan99"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      ☕ Buy Me a Cup of Coffee — Cash App
+    </a>
+
+  </div>
+
+  <div class="note">
+    Cash App: $Dchan99
+  </div>
 
 </section>
+
 
 </main>
 
@@ -574,729 +831,2108 @@ Cash App: $Dchan99
 
 "use strict";
 
+
+/* =========================
+   SETTINGS
+========================= */
+
+const MAX_TRACKS = 20;
+
+
+/* =========================
+   ELEMENTS
+========================= */
+
 const fileInput =
-document.getElementById("files");
+  document.getElementById("fileInput");
 
-const loadBtn =
-document.getElementById("loadMusicBtn");
+const addBtn =
+  document.getElementById("addBtn");
 
-const status =
-document.getElementById("loadStatus");
+const clearBtn =
+  document.getElementById("clearBtn");
 
-const deckA =
-document.getElementById("deckA");
+const trackList =
+  document.getElementById("trackList");
 
-const deckB =
-document.getElementById("deckB");
+const trackCount =
+  document.getElementById("trackCount");
 
-const nameA =
-document.getElementById("nameA");
+const loadStatus =
+  document.getElementById("loadStatus");
 
-const nameB =
-document.getElementById("nameB");
+const crossfade =
+  document.getElementById("crossfade");
 
-const playA =
-document.getElementById("playA");
+const crossfadeValue =
+  document.getElementById("crossfadeValue");
 
-const playB =
-document.getElementById("playB");
+const master =
+  document.getElementById("master");
 
-const restartA =
-document.getElementById("restartA");
+const masterValue =
+  document.getElementById("masterValue");
 
-const restartB =
-document.getElementById("restartB");
+const previewBtn =
+  document.getElementById("previewBtn");
 
-const seekA =
-document.getElementById("seekA");
+const stopBtn =
+  document.getElementById("stopBtn");
 
-const seekB =
-document.getElementById("seekB");
+const nowPlaying =
+  document.getElementById("nowPlaying");
 
-const timeA =
-document.getElementById("timeA");
+const wavBtn =
+  document.getElementById("wavBtn");
 
-const timeB =
-document.getElementById("timeB");
+const mp3Btn =
+  document.getElementById("mp3Btn");
 
-const durationA =
-document.getElementById("durationA");
+const exportStatus =
+  document.getElementById("exportStatus");
 
-const durationB =
-document.getElementById("durationB");
-
-const volumeA =
-document.getElementById("volumeA");
-
-const volumeB =
-document.getElementById("volumeB");
-
-const volumeTextA =
-document.getElementById("volumeTextA");
-
-const volumeTextB =
-document.getElementById("volumeTextB");
-
-const crossfader =
-document.getElementById("crossfader");
-
-const playBoth =
-document.getElementById("playBoth");
-
-const stopAll =
-document.getElementById("stopAll");
+const progressBar =
+  document.getElementById("progressBar");
 
 
-let urlA = null;
-let urlB = null;
+/* =========================
+   PLAYLIST DATA
+========================= */
 
-let volumeSettingA = 1;
-let volumeSettingB = 1;
+let tracks = [];
+
+
+/* =========================
+   PREVIEW PLAYERS
+========================= */
+
+const audioA = new Audio();
+const audioB = new Audio();
+
+audioA.preload = "auto";
+audioB.preload = "auto";
+
+let previewStopped = true;
+let fadeInterval = null;
+
+
+/* =========================
+   UTILITY
+========================= */
+
+function escapeHtml(text) {
+
+  return String(text).replace(
+    /[&<>"']/g,
+    character => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[character]
+  );
+
+}
 
 
 function formatTime(seconds) {
 
-if (!Number.isFinite(seconds))
-return "0:00";
+  if (
+    !Number.isFinite(seconds) ||
+    seconds < 0
+  ) {
+    return "0:00";
+  }
 
-const minutes =
-Math.floor(seconds / 60);
+  const minutes =
+    Math.floor(seconds / 60);
 
-const secs =
-Math.floor(seconds % 60)
-.toString()
-.padStart(2,"0");
+  const remainingSeconds =
+    Math.floor(seconds % 60)
+      .toString()
+      .padStart(2, "0");
 
-return `${minutes}:${secs}`;
-
-}
-
-
-function revoke(url) {
-
-if (!url) return;
-
-try {
-URL.revokeObjectURL(url);
-}
-catch(error) {
-console.log(error);
-}
+  return (
+    minutes +
+    ":" +
+    remainingSeconds
+  );
 
 }
 
 
-function resetAudio(audio) {
+/* =========================
+   BUTTON STATE
+========================= */
 
-audio.pause();
+function updateControls() {
 
-audio.removeAttribute("src");
+  const ready =
+    tracks.length >= 2;
 
-audio.load();
+  trackCount.textContent =
+    tracks.length +
+    " / " +
+    MAX_TRACKS;
 
-}
+  previewBtn.disabled =
+    !ready;
 
+  wavBtn.disabled =
+    !ready;
 
-function clearA() {
-
-revoke(urlA);
-
-urlA = null;
-
-resetAudio(deckA);
-
-nameA.textContent =
-"No song loaded";
-
-seekA.value = 0;
-
-timeA.textContent =
-"0:00";
-
-durationA.textContent =
-"0:00";
-
-playA.textContent =
-"▶ Play";
+  mp3Btn.disabled =
+    !ready;
 
 }
 
 
-function clearB() {
+/* =========================
+   PLAYLIST UI
+========================= */
 
-revoke(urlB);
+function renderTracks() {
 
-urlB = null;
+  trackList.innerHTML = "";
 
-resetAudio(deckB);
+  if (!tracks.length) {
 
-nameB.textContent =
-"No song loaded";
+    trackList.innerHTML =
+      '<div class="status">' +
+      'No songs loaded yet.' +
+      '</div>';
 
-seekB.value = 0;
+    updateControls();
 
-timeB.textContent =
-"0:00";
+    return;
+  }
 
-durationB.textContent =
-"0:00";
 
-playB.textContent =
-"▶ Play";
+  tracks.forEach(
+    (track, index) => {
+
+      const row =
+        document.createElement("div");
+
+      row.className =
+        "track";
+
+      row.innerHTML = `
+
+        <div class="track-top">
+
+          <div class="track-number">
+            ${index + 1}
+          </div>
+
+          <div class="track-info">
+
+            <div class="track-name">
+              ${escapeHtml(track.file.name)}
+            </div>
+
+            <div class="track-meta">
+              ${
+                track.duration
+                  ? formatTime(track.duration)
+                  : "Reading audio..."
+              }
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="track-buttons">
+
+          <button
+            class="mini"
+            data-action="up"
+            data-index="${index}"
+            ${index === 0 ? "disabled" : ""}
+          >
+            ↑ Up
+          </button>
+
+
+          <button
+            class="mini"
+            data-action="down"
+            data-index="${index}"
+            ${
+              index === tracks.length - 1
+                ? "disabled"
+                : ""
+            }
+          >
+            ↓ Down
+          </button>
+
+
+          <button
+            class="mini remove"
+            data-action="remove"
+            data-index="${index}"
+          >
+            Remove
+          </button>
+
+        </div>
+
+      `;
+
+      trackList.appendChild(row);
+
+    }
+  );
+
+  updateControls();
 
 }
 
 
-function applyCrossfade() {
+/* =========================
+   READ SONG DURATION
+========================= */
 
-const position =
-Number(crossfader.value) / 100;
+function getDuration(file) {
 
-let gainA = 1;
-let gainB = 1;
+  return new Promise(resolve => {
 
-if (position < 0) {
+    const url =
+      URL.createObjectURL(file);
 
-gainB =
-1 + position;
+    const audio =
+      new Audio();
+
+    audio.preload =
+      "metadata";
+
+
+    audio.onloadedmetadata =
+      () => {
+
+        const duration =
+          audio.duration;
+
+        URL.revokeObjectURL(url);
+
+        resolve(
+          Number.isFinite(duration)
+            ? duration
+            : 0
+        );
+
+      };
+
+
+    audio.onerror =
+      () => {
+
+        URL.revokeObjectURL(url);
+
+        resolve(0);
+
+      };
+
+
+    audio.src =
+      url;
+
+  });
 
 }
 
-else if (position > 0) {
 
-gainA =
-1 - position;
+/* =========================
+   ADD SONGS
+========================= */
 
-}
+addBtn.addEventListener(
+  "click",
+  () => {
 
-deckA.volume =
-Math.max(
-0,
-Math.min(
-1,
-volumeSettingA * gainA
-)
+    fileInput.value =
+      "";
+
+    fileInput.click();
+
+  }
 );
 
-deckB.volume =
-Math.max(
-0,
-Math.min(
-1,
-volumeSettingB * gainB
-)
-);
-
-}
-
-
-function loadIntoA(file) {
-
-clearA();
-
-urlA =
-URL.createObjectURL(file);
-
-deckA.src =
-urlA;
-
-nameA.textContent =
-file.name;
-
-deckA.load();
-
-}
-
-
-function loadIntoB(file) {
-
-clearB();
-
-urlB =
-URL.createObjectURL(file);
-
-deckB.src =
-urlB;
-
-nameB.textContent =
-file.name;
-
-deckB.load();
-
-}
-
-
-/* OPEN FILE PICKER */
-
-loadBtn.addEventListener(
-"click",
-() => {
-
-fileInput.value = "";
-
-fileInput.click();
-
-}
-);
-
-
-/* LOAD MUSIC */
 
 fileInput.addEventListener(
-"change",
-() => {
+  "change",
+  async () => {
 
-try {
+    const incoming =
+      Array.from(
+        fileInput.files || []
+      );
 
-const files =
-Array.from(
-fileInput.files || []
+
+    if (!incoming.length) {
+      return;
+    }
+
+
+    const room =
+      MAX_TRACKS -
+      tracks.length;
+
+
+    if (room <= 0) {
+
+      loadStatus.textContent =
+        "Maximum playlist size is 20 songs.";
+
+      fileInput.value =
+        "";
+
+      return;
+    }
+
+
+    const chosen =
+      incoming.slice(
+        0,
+        room
+      );
+
+
+    chosen.forEach(
+      file => {
+
+        tracks.push({
+          file,
+          duration: 0
+        });
+
+      }
+    );
+
+
+    loadStatus.textContent =
+      "✅ Added " +
+      chosen.length +
+      " song" +
+      (
+        chosen.length === 1
+          ? ""
+          : "s"
+      ) +
+      ". " +
+      tracks.length +
+      " total.";
+
+
+    if (
+      incoming.length >
+      room
+    ) {
+
+      loadStatus.textContent +=
+        " Maximum is 20 songs.";
+
+    }
+
+
+    renderTracks();
+
+
+    for (
+      const track
+      of tracks.filter(
+        item =>
+          !item.duration
+      )
+    ) {
+
+      track.duration =
+        await getDuration(
+          track.file
+        );
+
+      renderTracks();
+
+    }
+
+
+    fileInput.value =
+      "";
+
+  }
 );
 
-if (!files.length) {
 
-status.textContent =
-"No music selected";
+/* =========================
+   REORDER / REMOVE
+========================= */
 
-fileInput.value = "";
+trackList.addEventListener(
+  "click",
+  event => {
 
-return;
+    const button =
+      event.target.closest(
+        "button[data-action]"
+      );
 
-}
 
-const selected =
-files.slice(0,2);
+    if (!button) {
+      return;
+    }
 
-if (selected[0])
-loadIntoA(selected[0]);
 
-if (selected[1])
-loadIntoB(selected[1]);
+    const index =
+      Number(
+        button.dataset.index
+      );
 
-applyCrossfade();
 
-if (selected.length === 1) {
+    const action =
+      button.dataset.action;
 
-status.textContent =
-"✅ Loaded Deck A: " +
-selected[0].name;
 
-}
+    if (
+      action === "remove"
+    ) {
 
-else {
+      tracks.splice(
+        index,
+        1
+      );
 
-status.textContent =
-"✅ Loaded 2 songs";
+    }
 
-}
 
-if (files.length > 2) {
+    if (
+      action === "up" &&
+      index > 0
+    ) {
 
-status.textContent +=
-" — only the first 2 were used";
+      [
+        tracks[index - 1],
+        tracks[index]
+      ] = [
+        tracks[index],
+        tracks[index - 1]
+      ];
 
-}
+    }
 
-}
 
-catch(error) {
+    if (
+      action === "down" &&
+      index <
+      tracks.length - 1
+    ) {
 
-console.error(error);
+      [
+        tracks[index + 1],
+        tracks[index]
+      ] = [
+        tracks[index],
+        tracks[index + 1]
+      ];
 
-status.textContent =
-"⚠️ Could not load music. Tap Load Music and try again.";
+    }
 
-}
 
-finally {
+    renderTracks();
 
-/*
-IMPORTANT:
-Reset picker so iPhone can
-select the same files again.
-*/
-
-fileInput.value = "";
-
-}
-
-}
+  }
 );
 
 
-/* PLAY / PAUSE */
+/* =========================
+   CLEAR PLAYLIST
+========================= */
 
-async function togglePlay(
-audio,
-button
+clearBtn.addEventListener(
+  "click",
+  () => {
+
+    stopPreview();
+
+    tracks = [];
+
+    renderTracks();
+
+    loadStatus.textContent =
+      "Playlist cleared. Choose 2–20 songs from Files.";
+
+    nowPlaying.textContent =
+      "Add at least 2 songs to begin.";
+
+  }
+);
+
+
+/* =========================
+   MIX SETTINGS
+========================= */
+
+crossfade.addEventListener(
+  "input",
+  () => {
+
+    crossfadeValue.textContent =
+      crossfade.value +
+      " seconds";
+
+  }
+);
+
+
+master.addEventListener(
+  "input",
+  () => {
+
+    masterValue.textContent =
+      master.value +
+      "%";
+
+  }
+);
+
+
+/* =========================
+   AUDIO PLAYER HELPERS
+========================= */
+
+function releaseAudio(audio) {
+
+  audio.pause();
+
+  audio.ontimeupdate =
+    null;
+
+  audio.onended =
+    null;
+
+
+  if (
+    audio._blobUrl
+  ) {
+
+    URL.revokeObjectURL(
+      audio._blobUrl
+    );
+
+    audio._blobUrl =
+      null;
+
+  }
+
+
+  audio.removeAttribute(
+    "src"
+  );
+
+  audio.load();
+
+}
+
+
+function loadAudioFile(
+  audio,
+  file
 ) {
 
-if (!audio.src) {
+  if (
+    audio._blobUrl
+  ) {
 
-status.textContent =
-"Load a song first";
+    URL.revokeObjectURL(
+      audio._blobUrl
+    );
 
-return;
+  }
 
-}
 
-try {
+  const url =
+    URL.createObjectURL(
+      file
+    );
 
-if (audio.paused) {
 
-await audio.play();
+  audio._blobUrl =
+    url;
 
-}
+  audio.src =
+    url;
 
-else {
-
-audio.pause();
-
-}
-
-}
-
-catch(error) {
-
-console.error(error);
-
-status.textContent =
-"⚠️ Tap Play again.";
-
-}
+  audio.load();
 
 }
 
 
-playA.addEventListener(
-"click",
-() => togglePlay(deckA,playA)
-);
+/* =========================
+   STOP PREVIEW
+========================= */
 
-playB.addEventListener(
-"click",
-() => togglePlay(deckB,playB)
-);
+function stopPreview() {
 
-
-/* RESTART */
-
-restartA.addEventListener(
-"click",
-() => {
-
-if (deckA.src)
-deckA.currentTime = 0;
-
-}
-);
-
-restartB.addEventListener(
-"click",
-() => {
-
-if (deckB.src)
-deckB.currentTime = 0;
-
-}
-);
+  previewStopped =
+    true;
 
 
-/* PLAY BUTTON TEXT */
-
-deckA.addEventListener(
-"play",
-() => {
-playA.textContent =
-"⏸ Pause";
-}
-);
-
-deckA.addEventListener(
-"pause",
-() => {
-playA.textContent =
-"▶ Play";
-}
-);
-
-deckA.addEventListener(
-"ended",
-() => {
-playA.textContent =
-"▶ Play";
-}
-);
+  clearInterval(
+    fadeInterval
+  );
 
 
-deckB.addEventListener(
-"play",
-() => {
-playB.textContent =
-"⏸ Pause";
-}
-);
-
-deckB.addEventListener(
-"pause",
-() => {
-playB.textContent =
-"▶ Play";
-}
-);
-
-deckB.addEventListener(
-"ended",
-() => {
-playB.textContent =
-"▶ Play";
-}
-);
+  fadeInterval =
+    null;
 
 
-/* SONG DURATION */
+  releaseAudio(
+    audioA
+  );
 
-deckA.addEventListener(
-"loadedmetadata",
-() => {
 
-durationA.textContent =
-formatTime(deckA.duration);
+  releaseAudio(
+    audioB
+  );
+
+
+  stopBtn.disabled =
+    true;
+
+
+  previewBtn.disabled =
+    tracks.length < 2;
 
 }
-);
-
-deckB.addEventListener(
-"loadedmetadata",
-() => {
-
-durationB.textContent =
-formatTime(deckB.duration);
-
-}
-);
 
 
-/* SEEK POSITION */
+/* =========================
+   PLAYLIST PREVIEW
+========================= */
 
-deckA.addEventListener(
-"timeupdate",
-() => {
-
-timeA.textContent =
-formatTime(
-deckA.currentTime
-);
-
-if (
-Number.isFinite(deckA.duration) &&
-deckA.duration > 0
+async function playPreviewTrack(
+  index,
+  currentAudio,
+  nextAudio,
+  alreadyPlaying = false
 ) {
 
-seekA.value =
-Math.round(
-(deckA.currentTime /
-deckA.duration)
-* 1000
-);
+  if (
+    previewStopped
+  ) {
+    return;
+  }
+
+
+  if (
+    index >= tracks.length
+  ) {
+
+    stopPreview();
+
+    nowPlaying.textContent =
+      "✅ Preview complete.";
+
+    return;
+  }
+
+
+  const masterGain =
+    Number(
+      master.value
+    ) / 100;
+
+
+  const fadeSeconds =
+    Number(
+      crossfade.value
+    );
+
+
+  if (
+    !alreadyPlaying
+  ) {
+
+    loadAudioFile(
+      currentAudio,
+      tracks[index].file
+    );
+
+
+    currentAudio.currentTime =
+      0;
+
+
+    currentAudio.volume =
+      masterGain;
+
+
+    try {
+
+      await currentAudio.play();
+
+    }
+    catch (error) {
+
+      console.error(error);
+
+      stopPreview();
+
+      nowPlaying.textContent =
+        "Playback was blocked. Tap Preview Mix again.";
+
+      return;
+
+    }
+
+  }
+  else {
+
+    currentAudio.volume =
+      masterGain;
+
+  }
+
+
+  nowPlaying.textContent =
+    "Now playing " +
+    (index + 1) +
+    "/" +
+    tracks.length +
+    ": " +
+    tracks[index].file.name;
+
+
+  let nextStarted =
+    false;
+
+
+  currentAudio.ontimeupdate =
+    async () => {
+
+      if (
+        previewStopped ||
+        nextStarted ||
+        index >=
+        tracks.length - 1
+      ) {
+        return;
+      }
+
+
+      const remaining =
+        currentAudio.duration -
+        currentAudio.currentTime;
+
+
+      if (
+        !Number.isFinite(
+          remaining
+        )
+      ) {
+        return;
+      }
+
+
+      if (
+        remaining <=
+        fadeSeconds
+      ) {
+
+        nextStarted =
+          true;
+
+
+        loadAudioFile(
+          nextAudio,
+          tracks[
+            index + 1
+          ].file
+        );
+
+
+        nextAudio.currentTime =
+          0;
+
+
+        nextAudio.volume =
+          fadeSeconds > 0
+            ? 0
+            : masterGain;
+
+
+        try {
+
+          await nextAudio.play();
+
+        }
+        catch (error) {
+
+          console.error(error);
+
+          return;
+
+        }
+
+
+        if (
+          fadeSeconds <= 0
+        ) {
+          return;
+        }
+
+
+        const startTime =
+          performance.now();
+
+
+        const fadeMs =
+          fadeSeconds *
+          1000;
+
+
+        clearInterval(
+          fadeInterval
+        );
+
+
+        fadeInterval =
+          setInterval(
+            () => {
+
+              const progress =
+                Math.min(
+                  1,
+                  (
+                    performance.now() -
+                    startTime
+                  ) /
+                  fadeMs
+                );
+
+
+              currentAudio.volume =
+                masterGain *
+                (
+                  1 -
+                  progress
+                );
+
+
+              nextAudio.volume =
+                masterGain *
+                progress;
+
+
+              if (
+                progress >= 1
+              ) {
+
+                clearInterval(
+                  fadeInterval
+                );
+
+                fadeInterval =
+                  null;
+
+              }
+
+            },
+            50
+          );
+
+      }
+
+    };
+
+
+  currentAudio.onended =
+    () => {
+
+      currentAudio.ontimeupdate =
+        null;
+
+      currentAudio.onended =
+        null;
+
+
+      clearInterval(
+        fadeInterval
+      );
+
+      fadeInterval =
+        null;
+
+
+      if (
+        index ===
+        tracks.length - 1
+      ) {
+
+        stopPreview();
+
+        nowPlaying.textContent =
+          "✅ Preview complete.";
+
+        return;
+
+      }
+
+
+      const oldCurrent =
+        currentAudio;
+
+
+      if (
+        nextStarted &&
+        !nextAudio.paused
+      ) {
+
+        if (
+          oldCurrent._blobUrl
+        ) {
+
+          URL.revokeObjectURL(
+            oldCurrent._blobUrl
+          );
+
+          oldCurrent._blobUrl =
+            null;
+
+        }
+
+
+        oldCurrent.removeAttribute(
+          "src"
+        );
+
+        oldCurrent.load();
+
+
+        playPreviewTrack(
+          index + 1,
+          nextAudio,
+          oldCurrent,
+          true
+        );
+
+      }
+      else {
+
+        releaseAudio(
+          oldCurrent
+        );
+
+
+        playPreviewTrack(
+          index + 1,
+          nextAudio,
+          oldCurrent,
+          false
+        );
+
+      }
+
+    };
 
 }
 
-}
+
+/* =========================
+   START PREVIEW
+========================= */
+
+previewBtn.addEventListener(
+  "click",
+  () => {
+
+    if (
+      tracks.length < 2
+    ) {
+      return;
+    }
+
+
+    stopPreview();
+
+
+    previewStopped =
+      false;
+
+
+    previewBtn.disabled =
+      true;
+
+
+    stopBtn.disabled =
+      false;
+
+
+    playPreviewTrack(
+      0,
+      audioA,
+      audioB,
+      false
+    );
+
+  }
 );
 
 
-deckB.addEventListener(
-"timeupdate",
-() => {
+stopBtn.addEventListener(
+  "click",
+  () => {
 
-timeB.textContent =
-formatTime(
-deckB.currentTime
+    stopPreview();
+
+    nowPlaying.textContent =
+      "Preview stopped.";
+
+  }
 );
 
-if (
-Number.isFinite(deckB.duration) &&
-deckB.duration > 0
+
+/* =========================
+   EXPORT PROGRESS
+========================= */
+
+function setProgress(
+  percentage,
+  message
 ) {
 
-seekB.value =
-Math.round(
-(deckB.currentTime /
-deckB.duration)
-* 1000
+  const value =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        percentage
+      )
+    );
+
+
+  progressBar.style.width =
+    value +
+    "%";
+
+
+  if (message) {
+
+    exportStatus.textContent =
+      message;
+
+  }
+
+}
+
+
+/* =========================
+   DECODE AUDIO
+========================= */
+
+async function decodeAllTracks() {
+
+  const AudioContextClass =
+    window.AudioContext ||
+    window.webkitAudioContext;
+
+
+  const context =
+    new AudioContextClass();
+
+
+  const decoded =
+    [];
+
+
+  for (
+    let index = 0;
+    index < tracks.length;
+    index++
+  ) {
+
+    setProgress(
+      (
+        index /
+        tracks.length
+      ) * 35,
+      "Decoding " +
+      (index + 1) +
+      "/" +
+      tracks.length +
+      ": " +
+      tracks[index].file.name
+    );
+
+
+    const arrayBuffer =
+      await tracks[
+        index
+      ].file.arrayBuffer();
+
+
+    const audioBuffer =
+      await context.decodeAudioData(
+        arrayBuffer.slice(0)
+      );
+
+
+    decoded.push(
+      audioBuffer
+    );
+
+  }
+
+
+  await context.close();
+
+
+  return decoded;
+
+}
+
+
+/* =========================
+   RENDER FULL MIX
+========================= */
+
+async function renderMix() {
+
+  const decoded =
+    await decodeAllTracks();
+
+
+  const sampleRate =
+    44100;
+
+
+  const fadeSeconds =
+    Number(
+      crossfade.value
+    );
+
+
+  const masterGain =
+    Number(
+      master.value
+    ) / 100;
+
+
+  let totalSeconds =
+    0;
+
+
+  decoded.forEach(
+    (
+      buffer,
+      index
+    ) => {
+
+      totalSeconds +=
+        buffer.duration;
+
+
+      if (
+        index > 0
+      ) {
+
+        totalSeconds -=
+          Math.min(
+            fadeSeconds,
+            decoded[
+              index - 1
+            ].duration,
+            buffer.duration
+          );
+
+      }
+
+    }
+  );
+
+
+  const totalFrames =
+    Math.max(
+      1,
+      Math.ceil(
+        totalSeconds *
+        sampleRate
+      )
+    );
+
+
+  const offline =
+    new OfflineAudioContext(
+      2,
+      totalFrames,
+      sampleRate
+    );
+
+
+  let cursor =
+    0;
+
+
+  decoded.forEach(
+    (
+      buffer,
+      index
+    ) => {
+
+      const source =
+        offline.createBufferSource();
+
+
+      source.buffer =
+        buffer;
+
+
+      const gain =
+        offline.createGain();
+
+
+      source
+        .connect(gain)
+        .connect(
+          offline.destination
+        );
+
+
+      const fadeIn =
+        index === 0
+          ? 0
+          : Math.min(
+              fadeSeconds,
+              decoded[
+                index - 1
+              ].duration,
+              buffer.duration
+            );
+
+
+      const startAt =
+        Math.max(
+          0,
+          cursor -
+          fadeIn
+        );
+
+
+      if (
+        index === 0 ||
+        fadeIn <= 0
+      ) {
+
+        gain.gain.setValueAtTime(
+          masterGain,
+          startAt
+        );
+
+      }
+      else {
+
+        gain.gain.setValueAtTime(
+          0,
+          startAt
+        );
+
+
+        gain.gain.linearRampToValueAtTime(
+          masterGain,
+          startAt +
+          fadeIn
+        );
+
+      }
+
+
+      if (
+        index <
+        decoded.length - 1
+      ) {
+
+        const fadeOut =
+          Math.min(
+            fadeSeconds,
+            buffer.duration,
+            decoded[
+              index + 1
+            ].duration
+          );
+
+
+        if (
+          fadeOut > 0
+        ) {
+
+          const fadeOutStart =
+            startAt +
+            buffer.duration -
+            fadeOut;
+
+
+          gain.gain.setValueAtTime(
+            masterGain,
+            fadeOutStart
+          );
+
+
+          gain.gain.linearRampToValueAtTime(
+            0,
+            startAt +
+            buffer.duration
+          );
+
+        }
+
+      }
+
+
+      source.start(
+        startAt
+      );
+
+
+      cursor =
+        startAt +
+        buffer.duration;
+
+    }
+  );
+
+
+  setProgress(
+    45,
+    "Rendering continuous mix…"
+  );
+
+
+  const rendered =
+    await offline.startRendering();
+
+
+  setProgress(
+    70,
+    "Mix rendered. Preparing file…"
+  );
+
+
+  return rendered;
+
+}
+
+
+/* =========================
+   WAV ENCODER
+========================= */
+
+function audioBufferToWav(
+  buffer
+) {
+
+  const channels =
+    2;
+
+
+  const sampleRate =
+    buffer.sampleRate;
+
+
+  const length =
+    buffer.length;
+
+
+  const dataLength =
+    length *
+    channels *
+    2;
+
+
+  const arrayBuffer =
+    new ArrayBuffer(
+      44 +
+      dataLength
+    );
+
+
+  const view =
+    new DataView(
+      arrayBuffer
+    );
+
+
+  function writeString(
+    offset,
+    string
+  ) {
+
+    for (
+      let index = 0;
+      index < string.length;
+      index++
+    ) {
+
+      view.setUint8(
+        offset + index,
+        string.charCodeAt(
+          index
+        )
+      );
+
+    }
+
+  }
+
+
+  writeString(
+    0,
+    "RIFF"
+  );
+
+
+  view.setUint32(
+    4,
+    36 +
+    dataLength,
+    true
+  );
+
+
+  writeString(
+    8,
+    "WAVE"
+  );
+
+
+  writeString(
+    12,
+    "fmt "
+  );
+
+
+  view.setUint32(
+    16,
+    16,
+    true
+  );
+
+
+  view.setUint16(
+    20,
+    1,
+    true
+  );
+
+
+  view.setUint16(
+    22,
+    channels,
+    true
+  );
+
+
+  view.setUint32(
+    24,
+    sampleRate,
+    true
+  );
+
+
+  view.setUint32(
+    28,
+    sampleRate *
+    channels *
+    2,
+    true
+  );
+
+
+  view.setUint16(
+    32,
+    channels *
+    2,
+    true
+  );
+
+
+  view.setUint16(
+    34,
+    16,
+    true
+  );
+
+
+  writeString(
+    36,
+    "data"
+  );
+
+
+  view.setUint32(
+    40,
+    dataLength,
+    true
+  );
+
+
+  const left =
+    buffer.getChannelData(
+      0
+    );
+
+
+  const right =
+    buffer.numberOfChannels >
+    1
+      ? buffer.getChannelData(
+          1
+        )
+      : left;
+
+
+  let offset =
+    44;
+
+
+  for (
+    let index = 0;
+    index < length;
+    index++
+  ) {
+
+    const leftSample =
+      Math.max(
+        -1,
+        Math.min(
+          1,
+          left[index]
+        )
+      );
+
+
+    const rightSample =
+      Math.max(
+        -1,
+        Math.min(
+          1,
+          right[index]
+        )
+      );
+
+
+    view.setInt16(
+      offset,
+      leftSample < 0
+        ? leftSample *
+          32768
+        : leftSample *
+          32767,
+      true
+    );
+
+
+    offset +=
+      2;
+
+
+    view.setInt16(
+      offset,
+      rightSample < 0
+        ? rightSample *
+          32768
+        : rightSample *
+          32767,
+      true
+    );
+
+
+    offset +=
+      2;
+
+  }
+
+
+  return new Blob(
+    [arrayBuffer],
+    {
+      type:
+        "audio/wav"
+    }
+  );
+
+}
+
+
+/* =========================
+   FLOAT TO 16 BIT
+========================= */
+
+function floatTo16Bit(
+  floatArray
+) {
+
+  const output =
+    new Int16Array(
+      floatArray.length
+    );
+
+
+  for (
+    let index = 0;
+    index <
+    floatArray.length;
+    index++
+  ) {
+
+    const sample =
+      Math.max(
+        -1,
+        Math.min(
+          1,
+          floatArray[
+            index
+          ]
+        )
+      );
+
+
+    output[index] =
+      sample < 0
+        ? sample *
+          32768
+        : sample *
+          32767;
+
+  }
+
+
+  return output;
+
+}
+
+
+/* =========================
+   MP3 ENCODER
+========================= */
+
+function audioBufferToMp3(
+  buffer
+) {
+
+  if (
+    !window.lamejs
+  ) {
+
+    throw new Error(
+      "MP3 encoder did not load. Check your internet connection and reload the app."
+    );
+
+  }
+
+
+  const sampleRate =
+    buffer.sampleRate;
+
+
+  const encoder =
+    new lamejs.Mp3Encoder(
+      2,
+      sampleRate,
+      192
+    );
+
+
+  const left =
+    floatTo16Bit(
+      buffer.getChannelData(
+        0
+      )
+    );
+
+
+  const right =
+    floatTo16Bit(
+      buffer.numberOfChannels >
+      1
+        ? buffer.getChannelData(
+            1
+          )
+        : buffer.getChannelData(
+            0
+          )
+    );
+
+
+  const blockSize =
+    1152;
+
+
+  const parts =
+    [];
+
+
+  for (
+    let index = 0;
+    index <
+    left.length;
+    index +=
+    blockSize
+  ) {
+
+    const mp3Buffer =
+      encoder.encodeBuffer(
+        left.subarray(
+          index,
+          index +
+          blockSize
+        ),
+        right.subarray(
+          index,
+          index +
+          blockSize
+        )
+      );
+
+
+    if (
+      mp3Buffer.length
+    ) {
+
+      parts.push(
+        new Uint8Array(
+          mp3Buffer
+        )
+      );
+
+    }
+
+  }
+
+
+  const end =
+    encoder.flush();
+
+
+  if (
+    end.length
+  ) {
+
+    parts.push(
+      new Uint8Array(
+        end
+      )
+    );
+
+  }
+
+
+  return new Blob(
+    parts,
+    {
+      type:
+        "audio/mpeg"
+    }
+  );
+
+}
+
+
+/* =========================
+   SAVE FILE
+========================= */
+
+async function saveBlob(
+  blob,
+  filename
+) {
+
+  const file =
+    new File(
+      [blob],
+      filename,
+      {
+        type:
+          blob.type
+      }
+    );
+
+
+  /*
+    On supported iPhones,
+    Share can provide
+    "Save to Files".
+  */
+
+  if (
+    navigator.share &&
+    navigator.canShare &&
+    navigator.canShare({
+      files: [file]
+    })
+  ) {
+
+    try {
+
+      await navigator.share({
+        files: [file],
+        title: filename
+      });
+
+      return;
+
+    }
+    catch (error) {
+
+      /*
+        If user closes the
+        share sheet, fall back
+        to normal download.
+      */
+
+      console.log(
+        error
+      );
+
+    }
+
+  }
+
+
+  const url =
+    URL.createObjectURL(
+      blob
+    );
+
+
+  const link =
+    document.createElement(
+      "a"
+    );
+
+
+  link.href =
+    url;
+
+
+  link.download =
+    filename;
+
+
+  document.body.appendChild(
+    link
+  );
+
+
+  link.click();
+
+
+  link.remove();
+
+
+  setTimeout(
+    () => {
+
+      URL.revokeObjectURL(
+        url
+      );
+
+    },
+    60000
+  );
+
+}
+
+
+/* =========================
+   EXPORT
+========================= */
+
+async function exportMix(
+  type
+) {
+
+  if (
+    tracks.length < 2
+  ) {
+    return;
+  }
+
+
+  stopPreview();
+
+
+  wavBtn.disabled =
+    true;
+
+
+  mp3Btn.disabled =
+    true;
+
+
+  previewBtn.disabled =
+    true;
+
+
+  setProgress(
+    1,
+    "Starting " +
+    type.toUpperCase() +
+    " export…"
+  );
+
+
+  try {
+
+    const rendered =
+      await renderMix();
+
+
+    let blob;
+    let filename;
+
+
+    if (
+      type === "wav"
+    ) {
+
+      setProgress(
+        80,
+        "Encoding WAV…"
+      );
+
+
+      blob =
+        audioBufferToWav(
+          rendered
+        );
+
+
+      filename =
+        "Zoony607-Mix.wav";
+
+    }
+    else {
+
+      setProgress(
+        80,
+        "Encoding MP3 at 192 kbps…"
+      );
+
+
+      blob =
+        audioBufferToMp3(
+          rendered
+        );
+
+
+      filename =
+        "Zoony607-Mix.mp3";
+
+    }
+
+
+    setProgress(
+      100,
+      "✅ " +
+      filename +
+      " is ready to save."
+    );
+
+
+    await saveBlob(
+      blob,
+      filename
+    );
+
+  }
+  catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    setProgress(
+      0,
+      "⚠️ Export failed: " +
+      (
+        error.message ||
+        error
+      )
+    );
+
+  }
+  finally {
+
+    wavBtn.disabled =
+      tracks.length < 2;
+
+
+    mp3Btn.disabled =
+      tracks.length < 2;
+
+
+    previewBtn.disabled =
+      tracks.length < 2;
+
+  }
+
+}
+
+
+/* =========================
+   EXPORT BUTTONS
+========================= */
+
+wavBtn.addEventListener(
+  "click",
+  () => {
+
+    exportMix(
+      "wav"
+    );
+
+  }
 );
 
-}
 
-}
+mp3Btn.addEventListener(
+  "click",
+  () => {
+
+    exportMix(
+      "mp3"
+    );
+
+  }
 );
 
 
-/* SEEK CONTROL */
-
-seekA.addEventListener(
-"input",
-() => {
-
-if (
-!Number.isFinite(deckA.duration)
-)
-return;
-
-deckA.currentTime =
-(Number(seekA.value) / 1000)
-* deckA.duration;
-
-}
-);
-
-
-seekB.addEventListener(
-"input",
-() => {
-
-if (
-!Number.isFinite(deckB.duration)
-)
-return;
-
-deckB.currentTime =
-(Number(seekB.value) / 1000)
-* deckB.duration;
-
-}
-);
-
-
-/* VOLUME */
-
-volumeA.addEventListener(
-"input",
-() => {
-
-volumeSettingA =
-Number(volumeA.value) / 100;
-
-volumeTextA.textContent =
-volumeA.value + "%";
-
-applyCrossfade();
-
-}
-);
-
-
-volumeB.addEventListener(
-"input",
-() => {
-
-volumeSettingB =
-Number(volumeB.value) / 100;
-
-volumeTextB.textContent =
-volumeB.value + "%";
-
-applyCrossfade();
-
-}
-);
-
-
-/* CROSSFADER */
-
-crossfader.addEventListener(
-"input",
-applyCrossfade
-);
-
-
-/* PLAY BOTH */
-
-playBoth.addEventListener(
-"click",
-async () => {
-
-const jobs = [];
-
-if (deckA.src)
-jobs.push(deckA.play());
-
-if (deckB.src)
-jobs.push(deckB.play());
-
-if (!jobs.length) {
-
-status.textContent =
-"Load music first";
-
-return;
-
-}
-
-await Promise.allSettled(jobs);
-
-}
-);
-
-
-/* STOP ALL */
-
-stopAll.addEventListener(
-"click",
-() => {
-
-[deckA,deckB]
-.forEach(audio => {
-
-audio.pause();
-
-try {
-audio.currentTime = 0;
-}
-catch(error) {}
-
-});
-
-}
-);
-
-
-/*
-IMPORTANT iPHONE FIX
-
-Do not restore old blob URLs.
-They stop working after the
-browser/app session closes.
-*/
+/* =========================
+   APP REOPEN FIX
+========================= */
 
 window.addEventListener(
-"pageshow",
-() => {
+  "pageshow",
+  () => {
 
-fileInput.value = "";
+    fileInput.value =
+      "";
 
-}
+  }
 );
 
 
-window.addEventListener(
-"pagehide",
-() => {
+/* =========================
+   INITIALIZE
+========================= */
 
-revoke(urlA);
-revoke(urlB);
+renderTracks();
 
-urlA = null;
-urlB = null;
-
-}
-);
-
-
-fileInput.value = "";
-
-applyCrossfade();
+updateControls();
 
 })();
 </script>
