@@ -1,393 +1,2163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#07111f" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Zoony Mix">
+
   <title>Zoony Mix</title>
+
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.svg">
+
   <style>
-    :root{
-      --bg:#050912; --panel:#0b1320; --panel2:#101b2b; --text:#f7f9fc;
-      --muted:#8da0b8; --blue:#16a3ff; --orange:#ff8a00; --line:#203149;
-      --danger:#ff4f63; --ok:#42d392;
+    :root {
+      --bg: #050912;
+      --panel: #0b1320;
+      --panel2: #0d1828;
+      --line: #20324a;
+      --text: #f7f9fc;
+      --muted: #8da0b8;
+      --blue: #16a3ff;
+      --orange: #ff8a19;
+      --danger: #ff4f63;
+      --ok: #42d392;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0; background:
-      radial-gradient(circle at 10% 0%, rgba(22,163,255,.16), transparent 35%),
-      radial-gradient(circle at 90% 0%, rgba(255,138,0,.14), transparent 30%),
-      var(--bg);
-      color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
-      min-height:100vh;
+
+    * {
+      box-sizing: border-box;
     }
-    .wrap{max-width:900px;margin:0 auto;padding:24px 16px 40px}
-    header{display:flex;align-items:center;gap:14px;margin-bottom:22px}
-    .logo{
-      width:58px;height:58px;border-radius:18px;display:grid;place-items:center;
-      background:linear-gradient(135deg,var(--blue),var(--orange));
-      box-shadow:0 10px 30px rgba(22,163,255,.18);
-      font-size:34px;font-weight:900;color:#08111c;
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont,
+        "SF Pro Display", "Segoe UI", sans-serif;
     }
-    h1{font-size:28px;margin:0;letter-spacing:.2px}
-    .sub{color:var(--muted);margin-top:4px;font-size:14px}
-    .card{
-      background:linear-gradient(180deg,rgba(16,27,43,.96),rgba(11,19,32,.96));
-      border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:16px;
-      box-shadow:0 14px 34px rgba(0,0,0,.22);
+
+    body {
+      min-height: 100svh;
+      padding:
+        max(18px, env(safe-area-inset-top))
+        14px
+        max(28px, env(safe-area-inset-bottom));
+
+      background:
+        radial-gradient(
+          circle at 10% 0%,
+          rgba(22,163,255,.20),
+          transparent 28%
+        ),
+        radial-gradient(
+          circle at 92% 0%,
+          rgba(255,138,25,.15),
+          transparent 28%
+        ),
+        var(--bg);
     }
-    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    button,.btn{
-      appearance:none;border:0;border-radius:14px;padding:13px 16px;
-      background:#18273b;color:var(--text);font-weight:700;font-size:15px;
-      cursor:pointer;text-align:center;
+
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
     }
-    button.primary,.btn.primary{background:linear-gradient(135deg,var(--blue),#007ee7)}
-    button.orange{background:linear-gradient(135deg,var(--orange),#ff6400);color:#101010}
-    button.ghost{border:1px solid var(--line);background:transparent}
-    button.danger{background:#2a1117;color:#ff8d9a;border:1px solid #5a2630}
-    button:disabled{opacity:.45;cursor:not-allowed}
-    input[type=file]{display:none}
-    .filebtn{display:inline-block}
-    .tracks{display:flex;flex-direction:column;gap:10px;margin-top:12px}
-    .track{
-      display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;
-      padding:12px;border:1px solid var(--line);border-radius:15px;background:#0c1726;
+
+    header {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin: 8px 2px 22px;
     }
-    .num{
-      width:36px;height:36px;border-radius:12px;background:#10253c;color:var(--blue);
-      display:grid;place-items:center;font-weight:900;
+
+    .logo {
+      width: 74px;
+      height: 74px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      font-size: 44px;
+      font-weight: 900;
+      color: #07111f;
+      background: linear-gradient(
+        145deg,
+        #2cc8ff,
+        #ff9d20
+      );
+      box-shadow: 0 16px 45px rgba(0,0,0,.28);
     }
-    .name{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .meta{font-size:12px;color:var(--muted);margin-top:3px}
-    .actions{display:flex;gap:6px}
-    .iconbtn{padding:9px 10px;border-radius:10px;font-size:14px}
-    .settings{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
-    label{font-weight:750}
-    .small{font-size:12px;color:var(--muted)}
-    input[type=range]{width:100%}
-    .status{
-      padding:12px 14px;border-radius:14px;background:#08121e;border:1px solid var(--line);
-      color:var(--muted);font-size:14px;margin-top:12px;
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 9vw, 54px);
+      letter-spacing: -.04em;
     }
-    .status.ok{color:#baf6da;border-color:#235f48}
-    .status.err{color:#ffb2bb;border-color:#6c2a35}
-    .progress{
-      width:100%;height:10px;border-radius:999px;background:#142238;overflow:hidden;margin-top:10px;
-      border:1px solid #1f314a;
+
+    .sub {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 16px;
+      font-weight: 650;
     }
-    .progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--orange))}
-    .time{font-variant-numeric:tabular-nums}
-    .note{line-height:1.45;color:var(--muted);font-size:13px}
-    footer{text-align:center;color:#53657d;font-size:12px;margin-top:20px}
-    @media(max-width:600px){
-      .track{grid-template-columns:38px 1fr}
-      .actions{grid-column:1/-1;justify-content:flex-end}
-      .row>*{flex:1}
-      .row .filebtn{flex:1}
-      button,.btn{width:100%}
+
+    .card {
+      margin-top: 16px;
+      padding: 18px;
+      border-radius: 26px;
+      background:
+        linear-gradient(
+          180deg,
+          rgba(13,24,40,.98),
+          rgba(8,18,31,.98)
+        );
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 55px rgba(0,0,0,.20);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    button,
+    .filebtn {
+      appearance: none;
+      border: none;
+      border-radius: 18px;
+      min-height: 58px;
+      padding: 14px 18px;
+      font-size: 18px;
+      font-weight: 850;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+    }
+
+    button:disabled {
+      opacity: .35;
+    }
+
+    .primary {
+      background:
+        linear-gradient(
+          135deg,
+          #1eb5ff,
+          #078cf4
+        );
+      color: white;
+    }
+
+    .orange {
+      background:
+        linear-gradient(
+          135deg,
+          #ff9a20,
+          #d86b00
+        );
+      color: #07111f;
+    }
+
+    .ghost {
+      background: #0d1828;
+      color: white;
+      border: 1px solid #263b57;
+    }
+
+    .danger {
+      background: #31131a;
+      color: #ffd7dc;
+      border: 1px solid rgba(255,79,99,.35);
+    }
+
+    input[type=file] {
+      display: none;
+    }
+
+    .hint,
+    .status {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: #07111d;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 15px;
+    }
+
+    .status.ok {
+      color: #cffff0;
+      border-color: rgba(66,211,146,.38);
+      background: rgba(66,211,146,.08);
+    }
+
+    .status.err {
+      color: #ffd5da;
+      border-color: rgba(255,79,99,.38);
+      background: rgba(255,79,99,.08);
+    }
+
+    .setting {
+      margin-top: 16px;
+    }
+
+    .settingHead {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .settingHead strong {
+      font-size: 21px;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 3px;
+    }
+
+    input[type=range] {
+      width: 100%;
+      margin-top: 12px;
+      accent-color: var(--blue);
+    }
+
+    .tracks {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .track {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #08121f;
+    }
+
+    .num {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: #102239;
+      color: #8fcfff;
+      font-weight: 850;
+    }
+
+    .name {
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .iconbtn {
+      min-height: 38px;
+      min-width: 38px;
+      padding: 7px 10px;
+      border-radius: 12px;
+      background: #102034;
+      color: white;
+      border: 1px solid #263b57;
+      font-size: 15px;
+    }
+
+    .iconbtn.danger {
+      background: #34131c;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    .progress {
+      height: 10px;
+      background: #13233a;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 14px;
+      border: 1px solid #233a58;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0%;
+      background:
+        linear-gradient(
+          90deg,
+          var(--orange),
+          var(--blue)
+        );
+      transition: width .2s;
+    }
+
+    footer {
+      color: #65758a;
+      text-align: center;
+      padding: 22px 8px 8px;
+      font-size: 13px;
+    }
+
+    @media(max-width:620px) {
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .row {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .track {
+        grid-template-columns: auto 1fr;
+      }
+
+      .actions {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+        padding-left: 46px;
+      }
     }
   </style>
 </head>
+
 <body>
+
 <div class="wrap">
+
   <header>
     <div class="logo">Z</div>
+
     <div>
       <h1>Zoony Mix</h1>
-      <div class="sub">Local iPhone playlist mixer • crossfade • export WAV</div>
+
+      <div class="sub">
+        Local iPhone playlist mixer • crossfade • export WAV
+      </div>
     </div>
   </header>
 
-  <div class="card">
+
+  <section class="card">
+
     <div class="row">
-      <label class="btn primary filebtn">
+
+      <label
+        class="filebtn primary"
+        for="files">
         Add Songs
-        <input id="files" type="file" accept=".mp3,.m4a,.aac,.wav,audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav" multiple>
       </label>
-      <button id="clear" class="ghost">Clear List</button>
-    </div>
-    <div id="tracks" class="tracks"></div>
-    <div id="empty" class="status">Add MP3, M4A, AAC, or WAV files from the iPhone Files app.</div>
-  </div>
 
-  <div class="card">
-    <div class="settings">
-      <div>
-        <label for="xfade">Crossfade</label>
-        <div class="small">How long each song overlaps the next one.</div>
+      <input
+        id="files"
+        type="file"
+        accept=".mp3,.m4a,.aac,.wav,audio/mpeg,audio/mp4,audio/aac,audio/wav,audio/x-wav"
+        multiple>
+
+      <button
+        id="clear"
+        class="ghost">
+        Clear List
+      </button>
+
+    </div>
+
+    <div class="hint">
+      Add MP3, M4A, AAC, or WAV files from the iPhone Files app.
+      You can select multiple songs.
+    </div>
+
+    <div
+      id="tracks"
+      class="tracks">
+    </div>
+
+    <div
+      id="empty"
+      class="status">
+      Add at least 2 songs to begin.
+    </div>
+
+  </section>
+
+
+  <section class="card">
+
+    <div class="setting">
+
+      <div class="settingHead">
+
+        <div>
+          <strong>Crossfade</strong>
+
+          <div class="small">
+            How long each song overlaps the next one.
+          </div>
+        </div>
+
+        <strong>
+          <span id="xfadeVal">8</span>s
+        </strong>
+
       </div>
-      <strong><span id="xfadeVal">8</span>s</strong>
-    </div>
-    <input id="xfade" type="range" min="0" max="15" value="8" step="1">
 
-    <div class="settings" style="margin-top:18px">
-      <div>
-        <label for="gain">Master level</label>
-        <div class="small">Leave a little headroom to reduce clipping.</div>
+      <input
+        id="xfade"
+        type="range"
+        min="0"
+        max="15"
+        step="1"
+        value="8">
+
+    </div>
+
+
+    <div class="setting">
+
+      <div class="settingHead">
+
+        <div>
+          <strong>Master level</strong>
+
+          <div class="small">
+            Leave a little headroom to reduce clipping.
+          </div>
+        </div>
+
+        <strong>
+          <span id="gainVal">90</span>%
+        </strong>
+
       </div>
-      <strong><span id="gainVal">90</span>%</strong>
-    </div>
-    <input id="gain" type="range" min="50" max="100" value="90" step="1">
-  </div>
 
-  <div class="card">
-    <div class="row">
-      <button id="preview" class="orange" disabled>Preview Mix</button>
-      <button id="stop" class="ghost" disabled>Stop</button>
-      <button id="render" class="primary" disabled>Export WAV</button>
-    </div>
-    <div id="status" class="status">Add at least 2 songs to begin.</div>
-    <div class="progress"><div id="bar"></div></div>
-  </div>
+      <input
+        id="gain"
+        type="range"
+        min="50"
+        max="100"
+        step="1"
+        value="90">
 
-  <div class="card">
-    <div class="note">
-      <strong>How it works:</strong> Zoony Mix keeps your songs on your device. It decodes the files locally in Safari, overlaps each track by your crossfade amount, and can render the result as one WAV file. Nothing is uploaded.
     </div>
-  </div>
 
-  <footer>Zoony Mix • private local mixer</footer>
+  </section>
+
+
+  <section class="card">
+
+    <div class="controls">
+
+      <button
+        id="preview"
+        class="orange"
+        disabled>
+        Preview Mix
+      </button>
+
+      <button
+        id="stop"
+        class="ghost"
+        disabled>
+        Stop
+      </button>
+
+      <button
+        id="render"
+        class="primary"
+        disabled>
+        Export WAV
+      </button>
+
+    </div>
+
+    <div
+      id="status"
+      class="status">
+      Add at least 2 songs to begin.
+    </div>
+
+    <div class="progress">
+      <div
+        id="bar"
+        class="bar">
+      </div>
+    </div>
+
+  </section>
+
+
+  <section class="card">
+
+    <div
+      class="hint"
+      style="margin-top:0">
+
+      <strong>How it works:</strong>
+
+      Zoony Mix keeps your songs on your device.
+      It decodes the files locally in Safari,
+      overlaps each track by your crossfade amount,
+      and can render the result as one WAV file.
+      Nothing is uploaded.
+
+    </div>
+
+  </section>
+
+
+  <footer>
+    Zoony Mix • private local mixer
+  </footer>
+
 </div>
 
+
 <script>
-const state = { items: [], ctx: null, sources: [], stopTimer: null };
 
-const $ = s => document.querySelector(s);
-const filesInput = $('#files'), tracksEl = $('#tracks'), emptyEl = $('#empty');
-const xfade = $('#xfade'), gain = $('#gain'), statusEl = $('#status'), bar = $('#bar');
-const previewBtn = $('#preview'), stopBtn = $('#stop'), renderBtn = $('#render');
+(() => {
 
-xfade.oninput = () => $('#xfadeVal').textContent = xfade.value;
-gain.oninput = () => $('#gainVal').textContent = gain.value;
+  "use strict";
 
-function fmt(sec){
-  if (!isFinite(sec)) return '…';
-  const m=Math.floor(sec/60), s=Math.round(sec%60).toString().padStart(2,'0');
-  return `${m}:${s}`;
-}
 
-function updateButtons(){
-  const ok = state.items.length >= 2;
-  previewBtn.disabled = !ok;
-  renderBtn.disabled = !ok;
-  emptyEl.style.display = state.items.length ? 'none' : 'block';
-}
+  const state = {
 
-function renderList(){
-  tracksEl.innerHTML = '';
-  state.items.forEach((it, i)=>{
-    const el=document.createElement('div'); el.className='track';
-    el.innerHTML = `
-      <div class="num">${String(i+1).padStart(2,'0')}</div>
-      <div>
-        <div class="name">${it.file.name.replace(/\.[^/.]+$/,'')}</div>
-        <div class="meta">${it.buffer ? fmt(it.buffer.duration) : 'Analyzing…'} • ${(it.file.size/1024/1024).toFixed(1)} MB</div>
-      </div>
-      <div class="actions">
-        <button class="iconbtn" ${i===0?'disabled':''} data-act="up" data-i="${i}">↑</button>
-        <button class="iconbtn" ${i===state.items.length-1?'disabled':''} data-act="down" data-i="${i}">↓</button>
-        <button class="iconbtn danger" data-act="del" data-i="${i}">✕</button>
-      </div>`;
-    tracksEl.appendChild(el);
-  });
-  tracksEl.querySelectorAll('button').forEach(b=>b.onclick=()=>{
-    const i=+b.dataset.i, act=b.dataset.act;
-    if(act==='del') state.items.splice(i,1);
-    if(act==='up' && i>0) [state.items[i-1],state.items[i]]=[state.items[i],state.items[i-1]];
-    if(act==='down' && i<state.items.length-1) [state.items[i+1],state.items[i]]=[state.items[i],state.items[i+1]];
-    renderList(); updateButtons();
-  });
-}
+    items: [],
 
-async function audioCtx(){
-  if(!state.ctx) state.ctx = new (window.AudioContext || window.webkitAudioContext)();
-  if(state.ctx.state==='suspended') await state.ctx.resume();
-  return state.ctx;
-}
+    ctx: null,
 
-filesInput.onchange = async (e)=>{
-  const newFiles=[...e.target.files];
-  if(!newFiles.length) return;
-  statusEl.className='status'; statusEl.textContent='Analyzing songs…';
-  const ctx=await audioCtx();
-  for(const file of newFiles){
-    const item={file, buffer:null};
-    state.items.push(item);
-    renderList(); updateButtons();
-    try{
-      const arr=await file.arrayBuffer();
-      item.buffer=await ctx.decodeAudioData(arr.slice(0));
-    }catch(err){
-      item.error=true;
-      statusEl.className='status err';
-      statusEl.textContent=`Could not read ${file.name}. Try MP3, AAC/M4A, or WAV.`;
+    sources: [],
+
+    stopTimer: null
+
+  };
+
+
+  const $ = s =>
+    document.querySelector(s);
+
+
+  const filesInput =
+    $("#files");
+
+  const tracksEl =
+    $("#tracks");
+
+  const emptyEl =
+    $("#empty");
+
+  const xfade =
+    $("#xfade");
+
+  const gain =
+    $("#gain");
+
+  const statusEl =
+    $("#status");
+
+  const previewBtn =
+    $("#preview");
+
+  const stopBtn =
+    $("#stop");
+
+  const renderBtn =
+    $("#render");
+
+  const clearBtn =
+    $("#clear");
+
+  const bar =
+    $("#bar");
+
+
+  xfade.oninput = () => {
+
+    $("#xfadeVal").textContent =
+      xfade.value;
+
+  };
+
+
+  gain.oninput = () => {
+
+    $("#gainVal").textContent =
+      gain.value;
+
+  };
+
+
+  function fmt(sec) {
+
+    if (!isFinite(sec)) {
+      return "…";
     }
-    renderList();
-  }
-  const good=state.items.filter(x=>x.buffer);
-  state.items=good;
-  renderList(); updateButtons();
-  if(good.length>=2){
-    statusEl.className='status ok';
-    statusEl.textContent=`Ready: ${good.length} songs.`;
-  }
-  filesInput.value='';
-};
 
-$('#clear').onclick=()=>{
-  stopPreview();
-  state.items=[];
-  renderList(); updateButtons();
-  statusEl.className='status'; statusEl.textContent='Add at least 2 songs to begin.';
-  bar.style.width='0%';
-};
+    const m =
+      Math.floor(sec / 60);
 
-function computeSchedule(buffers, fade){
-  const starts=[]; let t=0;
-  for(let i=0;i<buffers.length;i++){
-    starts.push(t);
-    t += buffers[i].duration;
-    if(i<buffers.length-1) t -= Math.min(fade, buffers[i].duration/2, buffers[i+1].duration/2);
+    const s =
+      Math.round(sec % 60)
+      .toString()
+      .padStart(2, "0");
+
+    return `${m}:${s}`;
+
   }
-  return {starts,total:t};
-}
 
-function addFades(ctx, src, gainNode, start, dur, fade, isFirst, isLast, master){
-  const g=gainNode.gain;
-  const f=Math.min(fade, dur/2);
-  g.setValueAtTime(master, start);
-  if(!isFirst && f>0){
-    g.setValueAtTime(0, start);
-    g.linearRampToValueAtTime(master, start+f);
+
+  function decodedItems() {
+
+    return state.items.filter(
+      x => x.buffer && !x.error
+    );
+
   }
-  if(!isLast && f>0){
-    g.setValueAtTime(master, start+dur-f);
-    g.linearRampToValueAtTime(0, start+dur);
+
+
+  function updateButtons() {
+
+    const ok =
+      decodedItems().length >= 2;
+
+    previewBtn.disabled =
+      !ok;
+
+    renderBtn.disabled =
+      !ok;
+
+    emptyEl.style.display =
+      state.items.length
+        ? "none"
+        : "block";
+
   }
-}
 
-async function preview(){
-  stopPreview();
-  const ctx=await audioCtx();
-  const fade=+xfade.value, master=+gain.value/100;
-  const {starts,total}=computeSchedule(state.items.map(x=>x.buffer),fade);
-  const t0=ctx.currentTime+0.08;
-  state.sources=[];
-  state.items.forEach((it,i)=>{
-    const src=ctx.createBufferSource(), g=ctx.createGain();
-    src.buffer=it.buffer; src.connect(g); g.connect(ctx.destination);
-    addFades(ctx,src,g,t0+starts[i],it.buffer.duration,fade,i===0,i===state.items.length-1,master);
-    src.start(t0+starts[i]); state.sources.push(src);
-  });
-  previewBtn.disabled=true; stopBtn.disabled=false;
-  statusEl.className='status ok'; statusEl.textContent=`Previewing ${fmt(total)} mix…`;
-  const startWall=performance.now();
-  const tick=()=>{
-    const p=Math.min(1,(performance.now()-startWall)/(total*1000));
-    bar.style.width=(p*100)+'%';
-    if(p<1 && state.sources.length) requestAnimationFrame(tick);
-  }; tick();
-  state.stopTimer=setTimeout(()=>stopPreview(true), total*1000+300);
-}
 
-function stopPreview(finished=false){
-  state.sources.forEach(s=>{try{s.stop()}catch(e){}});
-  state.sources=[];
-  if(state.stopTimer) clearTimeout(state.stopTimer);
-  previewBtn.disabled=state.items.length<2; stopBtn.disabled=true;
-  if(!finished){
-    statusEl.className='status'; statusEl.textContent='Preview stopped.';
-  }else{
-    statusEl.className='status ok'; statusEl.textContent='Preview finished.';
+  function escapeHtml(v = "") {
+
+    return String(v).replace(
+
+      /[&<>"']/g,
+
+      ch => ({
+
+        "&": "&amp;",
+
+        "<": "&lt;",
+
+        ">": "&gt;",
+
+        '"': "&quot;",
+
+        "'": "&#039;"
+
+      }[ch])
+
+    );
+
   }
-}
-previewBtn.onclick=preview;
-stopBtn.onclick=()=>stopPreview(false);
 
-function writeWavFromAudioBuffer(buffer){
-  const channels=buffer.numberOfChannels;
-  const rate=buffer.sampleRate;
-  const length=buffer.length;
-  const bytesPerSample=2;
-  const blockAlign=channels*bytesPerSample;
-  const out=new ArrayBuffer(44+length*blockAlign);
-  const view=new DataView(out);
-  let p=0;
-  const str=s=>{for(let i=0;i<s.length;i++)view.setUint8(p++,s.charCodeAt(i));};
-  str('RIFF'); view.setUint32(p,36+length*blockAlign,true); p+=4;
-  str('WAVE'); str('fmt '); view.setUint32(p,16,true); p+=4;
-  view.setUint16(p,1,true); p+=2; view.setUint16(p,channels,true); p+=2;
-  view.setUint32(p,rate,true); p+=4; view.setUint32(p,rate*blockAlign,true); p+=4;
-  view.setUint16(p,blockAlign,true); p+=2; view.setUint16(p,16,true); p+=2;
-  str('data'); view.setUint32(p,length*blockAlign,true); p+=4;
-  const data=[]; for(let c=0;c<channels;c++) data.push(buffer.getChannelData(c));
-  for(let i=0;i<length;i++){
-    for(let c=0;c<channels;c++){
-      let s=Math.max(-1,Math.min(1,data[c][i]));
-      s=s<0?s*0x8000:s*0x7fff;
-      view.setInt16(p,s,true); p+=2;
+
+  function renderList() {
+
+    tracksEl.innerHTML = "";
+
+
+    state.items.forEach(
+      (it, i) => {
+
+        const el =
+          document.createElement("div");
+
+        el.className =
+          "track";
+
+
+        let meta =
+          "Waiting…";
+
+
+        if (it.error) {
+
+          meta =
+            "Could not decode";
+
+          if (it.errorMessage) {
+
+            meta +=
+              ": " +
+              it.errorMessage;
+
+          }
+
+        }
+
+        else if (it.buffer) {
+
+          meta =
+            `${fmt(it.buffer.duration)} • ` +
+            `${(it.file.size / 1024 / 1024).toFixed(1)} MB`;
+
+        }
+
+        else if (it.loading) {
+
+          meta =
+            "Analyzing…";
+
+        }
+
+
+        el.innerHTML = `
+
+          <div class="num">
+            ${String(i + 1).padStart(2, "0")}
+          </div>
+
+          <div>
+
+            <div class="name">
+              ${escapeHtml(it.file.name)}
+            </div>
+
+            <div class="meta">
+              ${escapeHtml(meta)}
+            </div>
+
+          </div>
+
+          <div class="actions">
+
+            <button
+              class="iconbtn"
+              data-act="up"
+              data-i="${i}"
+              ${i === 0 ? "disabled" : ""}>
+              ↑
+            </button>
+
+            <button
+              class="iconbtn"
+              data-act="down"
+              data-i="${i}"
+              ${i === state.items.length - 1
+                ? "disabled"
+                : ""}>
+              ↓
+            </button>
+
+            <button
+              class="iconbtn danger"
+              data-act="del"
+              data-i="${i}">
+              ✕
+            </button>
+
+          </div>
+
+        `;
+
+
+        tracksEl.appendChild(el);
+
+      }
+    );
+
+
+    tracksEl
+      .querySelectorAll(
+        "button[data-act]"
+      )
+      .forEach(btn => {
+
+        btn.onclick = () => {
+
+          const i =
+            Number(btn.dataset.i);
+
+          const act =
+            btn.dataset.act;
+
+
+          if (act === "del") {
+
+            state.items.splice(
+              i,
+              1
+            );
+
+          }
+
+
+          if (
+            act === "up" &&
+            i > 0
+          ) {
+
+            [
+              state.items[i - 1],
+              state.items[i]
+            ] =
+            [
+              state.items[i],
+              state.items[i - 1]
+            ];
+
+          }
+
+
+          if (
+            act === "down" &&
+            i < state.items.length - 1
+          ) {
+
+            [
+              state.items[i + 1],
+              state.items[i]
+            ] =
+            [
+              state.items[i],
+              state.items[i + 1]
+            ];
+
+          }
+
+
+          renderList();
+
+          updateButtons();
+
+        };
+
+      });
+
+  }
+
+
+  async function audioCtx() {
+
+    const AC =
+      window.AudioContext ||
+      window.webkitAudioContext;
+
+
+    if (!AC) {
+
+      throw new Error(
+        "Web Audio is not supported on this device."
+      );
+
     }
-  }
-  return new Blob([view],{type:'audio/wav'});
-}
 
-async function renderMix(){
-  stopPreview();
-  renderBtn.disabled=true; previewBtn.disabled=true;
-  try{
-    const fade=+xfade.value, master=+gain.value/100;
-    const buffers=state.items.map(x=>x.buffer);
-    const {starts,total}=computeSchedule(buffers,fade);
-    const sampleRate=Math.max(...buffers.map(b=>b.sampleRate));
-    const channels=Math.max(...buffers.map(b=>b.numberOfChannels));
-    const frames=Math.ceil(total*sampleRate);
-    statusEl.className='status'; statusEl.textContent=`Rendering ${fmt(total)} WAV locally…`;
-    bar.style.width='15%';
-    const off=new OfflineAudioContext(channels,frames,sampleRate);
-    state.items.forEach((it,i)=>{
-      const src=off.createBufferSource(), g=off.createGain();
-      src.buffer=it.buffer; src.connect(g); g.connect(off.destination);
-      addFades(off,src,g,starts[i],it.buffer.duration,fade,i===0,i===state.items.length-1,master);
-      src.start(starts[i]);
-    });
-    bar.style.width='35%';
-    const rendered=await off.startRendering();
-    bar.style.width='75%';
-    const blob=writeWavFromAudioBuffer(rendered);
-    bar.style.width='95%';
 
-    const filename='ZoonyMix.wav';
-    const file=new File([blob],filename,{type:'audio/wav'});
-    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
-      statusEl.className='status ok'; statusEl.textContent='Mix rendered. Opening iPhone share sheet…';
-      bar.style.width='100%';
-      await navigator.share({files:[file],title:'Zoony Mix'});
-    }else{
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a'); a.href=url; a.download=filename; a.textContent='Download ZoonyMix.wav';
-      a.className='btn primary'; a.style.display='inline-block'; a.style.marginTop='12px';
-      statusEl.innerHTML='Mix rendered. ';
-      statusEl.appendChild(a);
-      statusEl.className='status ok'; bar.style.width='100%';
+    if (!state.ctx) {
+
+      state.ctx =
+        new AC();
+
     }
-  }catch(err){
-    console.error(err);
-    statusEl.className='status err';
-    statusEl.textContent='Render failed. On iPhone, very large WAV projects may exceed Safari memory. Try MP3/M4A source files or fewer tracks.';
-    bar.style.width='0%';
-  }finally{
-    renderBtn.disabled=state.items.length<2;
-    previewBtn.disabled=state.items.length<2;
-  }
-}
-renderBtn.onclick=renderMix;
-updateButtons();
 
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
-}
+
+    if (
+      state.ctx.state ===
+      "suspended"
+    ) {
+
+      await state.ctx.resume();
+
+    }
+
+
+    return state.ctx;
+
+  }
+
+
+  function decodeWithTimeout(
+    ctx,
+    arr,
+    timeoutMs = 20000
+  ) {
+
+    return new Promise(
+      (resolve, reject) => {
+
+        let settled =
+          false;
+
+
+        const finish =
+          (fn, value) => {
+
+            if (settled) {
+              return;
+            }
+
+            settled =
+              true;
+
+            clearTimeout(timer);
+
+            fn(value);
+
+          };
+
+
+        const timer =
+          setTimeout(() => {
+
+            finish(
+              reject,
+              new Error(
+                "decode timed out"
+              )
+            );
+
+          }, timeoutMs);
+
+
+        const success =
+          buffer => {
+
+            finish(
+              resolve,
+              buffer
+            );
+
+          };
+
+
+        const failure =
+          err => {
+
+            finish(
+
+              reject,
+
+              err ||
+              new Error(
+                "decode failed"
+              )
+
+            );
+
+          };
+
+
+        try {
+
+          const p =
+            ctx.decodeAudioData(
+              arr,
+              success,
+              failure
+            );
+
+
+          if (
+            p &&
+            typeof p.then ===
+            "function"
+          ) {
+
+            p
+              .then(success)
+              .catch(failure);
+
+          }
+
+        }
+
+        catch (err) {
+
+          failure(err);
+
+        }
+
+      }
+    );
+
+  }
+
+
+  filesInput.onchange =
+    async e => {
+
+      const newFiles =
+        [...e.target.files];
+
+
+      filesInput.value =
+        "";
+
+
+      if (!newFiles.length) {
+        return;
+      }
+
+
+      let good =
+        0;
+
+      let failed =
+        0;
+
+
+      statusEl.className =
+        "status";
+
+
+      statusEl.textContent =
+        `Analyzing ${newFiles.length} ` +
+        `song${newFiles.length === 1 ? "" : "s"}…`;
+
+
+      let ctx;
+
+
+      try {
+
+        ctx =
+          await audioCtx();
+
+      }
+
+      catch (err) {
+
+        statusEl.className =
+          "status err";
+
+        statusEl.textContent =
+          err.message;
+
+        return;
+
+      }
+
+
+      for (
+        const file
+        of newFiles
+      ) {
+
+        const item = {
+
+          file,
+
+          buffer: null,
+
+          error: false,
+
+          loading: true
+
+        };
+
+
+        state.items.push(
+          item
+        );
+
+
+        renderList();
+
+        updateButtons();
+
+
+        try {
+
+          statusEl.className =
+            "status";
+
+          statusEl.textContent =
+            `Analyzing ${file.name}…`;
+
+
+          const arr =
+            await file.arrayBuffer();
+
+
+          item.buffer =
+            await decodeWithTimeout(
+              ctx,
+              arr,
+              20000
+            );
+
+
+          item.loading =
+            false;
+
+
+          good++;
+
+        }
+
+        catch (err) {
+
+          item.loading =
+            false;
+
+          item.error =
+            true;
+
+          item.errorMessage =
+            err &&
+            err.message
+              ? err.message
+              : "unsupported audio";
+
+
+          failed++;
+
+
+          console.error(
+            "Could not decode:",
+            file.name,
+            err
+          );
+
+        }
+
+
+        renderList();
+
+        updateButtons();
+
+      }
+
+
+      if (
+        good > 0 &&
+        failed === 0
+      ) {
+
+        statusEl.className =
+          "status ok";
+
+        statusEl.textContent =
+          `${good} song${good === 1 ? "" : "s"} ready.`;
+
+      }
+
+      else if (
+        good > 0
+      ) {
+
+        statusEl.className =
+          "status";
+
+        statusEl.textContent =
+          `${good} ready, ${failed} could not be decoded.`;
+
+      }
+
+      else {
+
+        statusEl.className =
+          "status err";
+
+        statusEl.textContent =
+          "None of those songs could be decoded.";
+
+      }
+
+    };
+
+
+  clearBtn.onclick =
+    () => {
+
+      stopPreview();
+
+      state.items =
+        [];
+
+      renderList();
+
+      updateButtons();
+
+      statusEl.className =
+        "status";
+
+      statusEl.textContent =
+        "Add at least 2 songs to begin.";
+
+      bar.style.width =
+        "0%";
+
+    };
+
+
+  function computeSchedule(
+    buffers,
+    fadeSec
+  ) {
+
+    const starts =
+      [];
+
+    let t =
+      0;
+
+
+    buffers.forEach(
+      (b, i) => {
+
+        starts.push(t);
+
+
+        if (
+          i <
+          buffers.length - 1
+        ) {
+
+          const overlap =
+            Math.min(
+              fadeSec,
+              b.duration,
+              buffers[i + 1].duration
+            );
+
+
+          t +=
+            Math.max(
+              0,
+              b.duration - overlap
+            );
+
+        }
+
+        else {
+
+          t +=
+            b.duration;
+
+        }
+
+      }
+    );
+
+
+    return {
+
+      starts,
+
+      total: t
+
+    };
+
+  }
+
+
+  function stopPreview() {
+
+    if (state.stopTimer) {
+
+      clearTimeout(
+        state.stopTimer
+      );
+
+      state.stopTimer =
+        null;
+
+    }
+
+
+    state.sources.forEach(
+      s => {
+
+        try {
+          s.stop();
+        }
+        catch {}
+
+        try {
+          s.disconnect();
+        }
+        catch {}
+
+      }
+    );
+
+
+    state.sources =
+      [];
+
+
+    stopBtn.disabled =
+      true;
+
+  }
+
+
+  previewBtn.onclick =
+    async () => {
+
+      stopPreview();
+
+
+      const items =
+        decodedItems();
+
+
+      if (
+        items.length < 2
+      ) {
+        return;
+      }
+
+
+      try {
+
+        const ctx =
+          await audioCtx();
+
+
+        const fade =
+          Number(
+            xfade.value
+          );
+
+
+        const master =
+          Number(
+            gain.value
+          ) / 100;
+
+
+        const buffers =
+          items.map(
+            x => x.buffer
+          );
+
+
+        const {
+          starts,
+          total
+        } =
+          computeSchedule(
+            buffers,
+            fade
+          );
+
+
+        statusEl.className =
+          "status ok";
+
+
+        statusEl.textContent =
+          `Previewing ${items.length} songs…`;
+
+
+        stopBtn.disabled =
+          false;
+
+
+        const base =
+          ctx.currentTime +
+          0.08;
+
+
+        items.forEach(
+          (it, i) => {
+
+            const src =
+              ctx.createBufferSource();
+
+
+            const g =
+              ctx.createGain();
+
+
+            src.buffer =
+              it.buffer;
+
+
+            src.connect(g);
+
+            g.connect(
+              ctx.destination
+            );
+
+
+            const t0 =
+              base +
+              starts[i];
+
+
+            const t1 =
+              t0 +
+              it.buffer.duration;
+
+
+            const f =
+              Math.min(
+                fade,
+                it.buffer.duration / 2
+              );
+
+
+            g.gain
+              .cancelScheduledValues(
+                t0
+              );
+
+
+            if (
+              i > 0 &&
+              f > 0
+            ) {
+
+              g.gain
+                .setValueAtTime(
+                  0,
+                  t0
+                );
+
+
+              g.gain
+                .linearRampToValueAtTime(
+                  master,
+                  t0 + f
+                );
+
+            }
+
+            else {
+
+              g.gain
+                .setValueAtTime(
+                  master,
+                  t0
+                );
+
+            }
+
+
+            if (
+              i <
+                items.length - 1 &&
+              f > 0
+            ) {
+
+              g.gain
+                .setValueAtTime(
+                  master,
+                  Math.max(
+                    t0,
+                    t1 - f
+                  )
+                );
+
+
+              g.gain
+                .linearRampToValueAtTime(
+                  0,
+                  t1
+                );
+
+            }
+
+
+            src.start(t0);
+
+
+            state.sources.push(
+              src
+            );
+
+          }
+        );
+
+
+        state.stopTimer =
+          setTimeout(
+            () => {
+
+              stopPreview();
+
+
+              statusEl.className =
+                "status ok";
+
+
+              statusEl.textContent =
+                "Preview finished.";
+
+            },
+
+            Math.ceil(
+              (total + .5) *
+              1000
+            )
+
+          );
+
+      }
+
+      catch (err) {
+
+        stopPreview();
+
+
+        statusEl.className =
+          "status err";
+
+
+        statusEl.textContent =
+          `Preview failed: ${
+            err.message || err
+          }`;
+
+      }
+
+    };
+
+
+  stopBtn.onclick =
+    () => {
+
+      stopPreview();
+
+      statusEl.className =
+        "status";
+
+      statusEl.textContent =
+        "Preview stopped.";
+
+    };
+
+
+  function writeWavFromAudioBuffer(
+    buffer
+  ) {
+
+    const channels =
+      buffer.numberOfChannels;
+
+
+    const sampleRate =
+      buffer.sampleRate;
+
+
+    const length =
+      buffer.length;
+
+
+    const bytesPerSample =
+      2;
+
+
+    const blockAlign =
+      channels *
+      bytesPerSample;
+
+
+    const byteRate =
+      sampleRate *
+      blockAlign;
+
+
+    const dataSize =
+      length *
+      blockAlign;
+
+
+    const view =
+      new DataView(
+        new ArrayBuffer(
+          44 + dataSize
+        )
+      );
+
+
+    let p =
+      0;
+
+
+    const str =
+      s => {
+
+        for (
+          let i = 0;
+          i < s.length;
+          i++
+        ) {
+
+          view.setUint8(
+            p++,
+            s.charCodeAt(i)
+          );
+
+        }
+
+      };
+
+
+    str("RIFF");
+
+
+    view.setUint32(
+      p,
+      36 + dataSize,
+      true
+    );
+
+    p += 4;
+
+
+    str("WAVE");
+
+    str("fmt ");
+
+
+    view.setUint32(
+      p,
+      16,
+      true
+    );
+
+    p += 4;
+
+
+    view.setUint16(
+      p,
+      1,
+      true
+    );
+
+    p += 2;
+
+
+    view.setUint16(
+      p,
+      channels,
+      true
+    );
+
+    p += 2;
+
+
+    view.setUint32(
+      p,
+      sampleRate,
+      true
+    );
+
+    p += 4;
+
+
+    view.setUint32(
+      p,
+      byteRate,
+      true
+    );
+
+    p += 4;
+
+
+    view.setUint16(
+      p,
+      blockAlign,
+      true
+    );
+
+    p += 2;
+
+
+    view.setUint16(
+      p,
+      16,
+      true
+    );
+
+    p += 2;
+
+
+    str("data");
+
+
+    view.setUint32(
+      p,
+      dataSize,
+      true
+    );
+
+    p += 4;
+
+
+    const channelData =
+      [];
+
+
+    for (
+      let c = 0;
+      c < channels;
+      c++
+    ) {
+
+      channelData.push(
+        buffer.getChannelData(c)
+      );
+
+    }
+
+
+    for (
+      let i = 0;
+      i < length;
+      i++
+    ) {
+
+      for (
+        let c = 0;
+        c < channels;
+        c++
+      ) {
+
+        let s =
+          Math.max(
+            -1,
+            Math.min(
+              1,
+              channelData[c][i]
+            )
+          );
+
+
+        s =
+          s < 0
+            ? s * 0x8000
+            : s * 0x7fff;
+
+
+        view.setInt16(
+          p,
+          s,
+          true
+        );
+
+
+        p += 2;
+
+      }
+
+    }
+
+
+    return new Blob(
+      [view],
+      {
+        type: "audio/wav"
+      }
+    );
+
+  }
+
+
+  async function renderMix() {
+
+    stopPreview();
+
+
+    const items =
+      decodedItems();
+
+
+    if (
+      items.length < 2
+    ) {
+      return;
+    }
+
+
+    renderBtn.disabled =
+      true;
+
+
+    previewBtn.disabled =
+      true;
+
+
+    try {
+
+      const fade =
+        Number(
+          xfade.value
+        );
+
+
+      const master =
+        Number(
+          gain.value
+        ) / 100;
+
+
+      const buffers =
+        items.map(
+          x => x.buffer
+        );
+
+
+      const {
+        starts,
+        total
+      } =
+        computeSchedule(
+          buffers,
+          fade
+        );
+
+
+      const sampleRate =
+        Math.max(
+          ...buffers.map(
+            b => b.sampleRate
+          )
+        );
+
+
+      const channels =
+        Math.max(
+          ...buffers.map(
+            b => b.numberOfChannels
+          )
+        );
+
+
+      const frames =
+        Math.ceil(
+          total *
+          sampleRate
+        );
+
+
+      const OAC =
+        window.OfflineAudioContext ||
+        window.webkitOfflineAudioContext;
+
+
+      if (!OAC) {
+
+        throw new Error(
+          "Offline audio rendering is not supported on this device."
+        );
+
+      }
+
+
+      statusEl.className =
+        "status";
+
+
+      statusEl.textContent =
+        "Rendering mix…";
+
+
+      bar.style.width =
+        "15%";
+
+
+      const off =
+        new OAC(
+          channels,
+          frames,
+          sampleRate
+        );
+
+
+      items.forEach(
+        (it, i) => {
+
+          const src =
+            off.createBufferSource();
+
+
+          const g =
+            off.createGain();
+
+
+          src.buffer =
+            it.buffer;
+
+
+          src.connect(g);
+
+          g.connect(
+            off.destination
+          );
+
+
+          const t0 =
+            starts[i];
+
+
+          const t1 =
+            t0 +
+            it.buffer.duration;
+
+
+          const f =
+            Math.min(
+              fade,
+              it.buffer.duration / 2
+            );
+
+
+          if (
+            i > 0 &&
+            f > 0
+          ) {
+
+            g.gain
+              .setValueAtTime(
+                0,
+                t0
+              );
+
+
+            g.gain
+              .linearRampToValueAtTime(
+                master,
+                t0 + f
+              );
+
+          }
+
+          else {
+
+            g.gain
+              .setValueAtTime(
+                master,
+                t0
+              );
+
+          }
+
+
+          if (
+            i <
+              items.length - 1 &&
+            f > 0
+          ) {
+
+            g.gain
+              .setValueAtTime(
+                master,
+                Math.max(
+                  t0,
+                  t1 - f
+                )
+              );
+
+
+            g.gain
+              .linearRampToValueAtTime(
+                0,
+                t1
+              );
+
+          }
+
+
+          src.start(
+            starts[i]
+          );
+
+        }
+      );
+
+
+      bar.style.width =
+        "35%";
+
+
+      const rendered =
+        await off.startRendering();
+
+
+      bar.style.width =
+        "75%";
+
+
+      const blob =
+        writeWavFromAudioBuffer(
+          rendered
+        );
+
+
+      bar.style.width =
+        "95%";
+
+
+      const filename =
+        "ZoonyMix.wav";
+
+
+      const file =
+        new File(
+          [blob],
+          filename,
+          {
+            type: "audio/wav"
+          }
+        );
+
+
+      if (
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({
+          files: [file]
+        })
+      ) {
+
+        statusEl.className =
+          "status ok";
+
+
+        statusEl.textContent =
+          "Mix rendered. Choose where to save or share it.";
+
+
+        bar.style.width =
+          "100%";
+
+
+        await navigator.share({
+
+          files: [file],
+
+          title:
+            "Zoony Mix"
+
+        });
+
+      }
+
+      else {
+
+        const url =
+          URL.createObjectURL(
+            blob
+          );
+
+
+        const a =
+          document.createElement(
+            "a"
+          );
+
+
+        a.href =
+          url;
+
+
+        a.download =
+          filename;
+
+
+        document.body
+          .appendChild(a);
+
+
+        a.click();
+
+
+        a.remove();
+
+
+        setTimeout(
+          () =>
+            URL.revokeObjectURL(
+              url
+            ),
+          60000
+        );
+
+
+        statusEl.className =
+          "status ok";
+
+
+        statusEl.textContent =
+          "Mix rendered and downloaded as ZoonyMix.wav.";
+
+
+        bar.style.width =
+          "100%";
+
+      }
+
+    }
+
+    catch (err) {
+
+      console.error(err);
+
+
+      statusEl.className =
+        "status err";
+
+
+      statusEl.textContent =
+        `Export failed: ${
+          err.message || err
+        }`;
+
+
+      bar.style.width =
+        "0%";
+
+    }
+
+    finally {
+
+      updateButtons();
+
+    }
+
+  }
+
+
+  renderBtn.onclick =
+    renderMix;
+
+
+  renderList();
+
+  updateButtons();
+
+
+})();
+
 </script>
+
 </body>
 </html>
