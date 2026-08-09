@@ -14,11 +14,10 @@
 
 <title>Zoony607 Playlist Mixer</title>
 
-<!-- Needed for MP3 export -->
+<!-- MP3 encoder -->
 <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
 
 <style>
-
 :root {
   --bg:#050a12;
   --panel:#0b1422;
@@ -41,21 +40,7 @@ html,
 body {
   margin:0;
   min-height:100%;
-  background:
-    radial-gradient(
-      circle at 20% 0%,
-      rgba(30,167,255,.15),
-      transparent 35%
-    ),
-    radial-gradient(
-      circle at 80% 0%,
-      rgba(255,116,23,.13),
-      transparent 35%
-    ),
-    var(--bg);
-
   color:var(--text);
-
   font-family:
     -apple-system,
     BlinkMacSystemFont,
@@ -63,6 +48,11 @@ body {
     Roboto,
     Arial,
     sans-serif;
+
+  background:
+    radial-gradient(circle at 20% 0%,rgba(30,167,255,.15),transparent 35%),
+    radial-gradient(circle at 80% 0%,rgba(255,116,23,.13),transparent 35%),
+    var(--bg);
 }
 
 body {
@@ -76,8 +66,6 @@ body {
   width:min(900px,100%);
   margin:0 auto;
 }
-
-/* LOGO */
 
 .brand {
   text-align:center;
@@ -93,9 +81,7 @@ body {
   width:min(270px,72vw);
   height:auto;
   margin:auto;
-
   border-radius:50%;
-
   box-shadow:
     0 0 30px rgba(30,167,255,.13),
     0 0 30px rgba(255,116,23,.10),
@@ -112,22 +98,17 @@ body {
   font-size:.86rem;
 }
 
-/* PANELS */
-
 .panel {
   margin-bottom:16px;
   padding:16px;
-
   border:1px solid var(--line);
   border-radius:22px;
-
   background:
     linear-gradient(
       180deg,
       rgba(16,29,48,.97),
       rgba(8,17,29,.97)
     );
-
   box-shadow:
     0 18px 50px rgba(0,0,0,.32);
 }
@@ -149,39 +130,27 @@ h2 {
 
 .subtitle {
   margin:0;
-
   color:var(--muted);
-
   font-size:.9rem;
   line-height:1.45;
 }
-
-/* BUTTONS */
 
 .actions {
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
-
   margin-top:14px;
 }
 
 .btn {
   min-height:52px;
-
   border:1px solid var(--line);
   border-radius:15px;
-
   padding:10px 14px;
-
   color:white;
-
-  background:
-    rgba(255,255,255,.055);
-
+  background:rgba(255,255,255,.055);
   font-size:.96rem;
   font-weight:800;
-
   cursor:pointer;
 }
 
@@ -195,7 +164,6 @@ h2 {
 
 .primary {
   border:0;
-
   background:
     linear-gradient(
       90deg,
@@ -214,38 +182,24 @@ h2 {
 }
 
 .red {
-  background:
-    rgba(255,81,98,.12);
-
-  border-color:
-    rgba(255,81,98,.30);
+  background:rgba(255,81,98,.12);
+  border-color:rgba(255,81,98,.30);
 }
-
-/* STATUS */
 
 .status {
   min-height:44px;
-
   margin-top:12px;
   padding:10px 12px;
-
   display:flex;
   justify-content:center;
   align-items:center;
-
   text-align:center;
-
   border:1px solid var(--line);
   border-radius:13px;
-
   color:var(--muted);
-
   font-size:.87rem;
-
   overflow-wrap:anywhere;
 }
-
-/* PLAYLIST */
 
 .playlist-header {
   display:flex;
@@ -262,18 +216,14 @@ h2 {
 .track-list {
   display:grid;
   gap:10px;
-
   margin-top:12px;
 }
 
 .track {
   padding:11px;
-
   border:1px solid var(--line);
   border-radius:15px;
-
-  background:
-    rgba(255,255,255,.035);
+  background:rgba(255,255,255,.035);
 }
 
 .track-top {
@@ -286,17 +236,11 @@ h2 {
   width:32px;
   min-width:32px;
   height:32px;
-
   display:grid;
   place-items:center;
-
   border-radius:9px;
-
-  background:
-    rgba(30,167,255,.12);
-
+  background:rgba(30,167,255,.12);
   color:var(--blue);
-
   font-size:.8rem;
   font-weight:900;
 }
@@ -309,15 +253,12 @@ h2 {
 .track-name {
   font-size:.92rem;
   font-weight:800;
-
   overflow-wrap:anywhere;
 }
 
 .track-meta {
   margin-top:4px;
-
   color:var(--muted);
-
   font-size:.78rem;
 }
 
@@ -325,21 +266,15 @@ h2 {
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
   gap:6px;
-
   margin-top:10px;
 }
 
 .mini {
   min-height:37px;
-
   border:1px solid var(--line);
   border-radius:10px;
-
-  background:
-    rgba(255,255,255,.045);
-
+  background:rgba(255,255,255,.045);
   color:white;
-
   font-weight:800;
 }
 
@@ -351,15 +286,12 @@ h2 {
   color:#ff9da8;
 }
 
-/* SLIDERS */
-
 .control-row {
   margin-top:17px;
 }
 
 .label-row {
   margin-bottom:8px;
-
   display:flex;
   justify-content:space-between;
   gap:12px;
@@ -378,48 +310,50 @@ input[type="range"] {
   accent-color:var(--blue);
 }
 
-/* PREVIEW */
+.text-input {
+  width:100%;
+  min-height:50px;
+  border-radius:13px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.05);
+  color:white;
+  padding:0 14px;
+  font-size:1rem;
+  outline:none;
+}
+
+.text-input::placeholder {
+  color:#7f8a9b;
+}
 
 .now-playing {
   min-height:22px;
-
   margin-top:12px;
-
   color:var(--muted);
-
   font-size:.87rem;
-
   overflow-wrap:anywhere;
 }
-
-/* EXPORT */
 
 .export-grid {
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
-
   margin-top:13px;
 }
 
 .progress {
   width:100%;
   height:11px;
-
   margin-top:15px;
-
   overflow:hidden;
-
   border:1px solid var(--line);
   border-radius:999px;
-
   background:#07101d;
 }
 
 .progress-bar {
   width:0%;
   height:100%;
-
   background:
     linear-gradient(
       90deg,
@@ -430,14 +364,10 @@ input[type="range"] {
 
 .note {
   margin-top:12px;
-
   color:var(--muted);
-
   font-size:.78rem;
   line-height:1.5;
 }
-
-/* SUPPORT */
 
 .support {
   text-align:center;
@@ -446,25 +376,18 @@ input[type="range"] {
 .support-links {
   display:grid;
   gap:10px;
-
   margin-top:14px;
 }
 
 .support-link {
   min-height:52px;
-
   padding:12px 14px;
-
   display:flex;
   justify-content:center;
   align-items:center;
-
   border-radius:15px;
-
   color:white;
-
   text-decoration:none;
-
   font-weight:850;
 }
 
@@ -487,14 +410,11 @@ input[type="range"] {
 }
 
 @media(max-width:600px) {
-
   .actions,
   .export-grid {
     grid-template-columns:1fr;
   }
-
 }
-
 </style>
 </head>
 
@@ -502,352 +422,315 @@ input[type="range"] {
 
 <main class="app">
 
-
-<!-- LOGO -->
-
 <div class="brand">
 
-<a
-  href="https://www.youtube.com/@ZooNY607"
-  target="_blank"
-  rel="noopener noreferrer"
->
+  <a
+    href="https://www.youtube.com/@ZooNY607"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <img
+      src="zoony607-logo.png"
+      alt="Zoony607"
+    >
+  </a>
 
-<img
-  src="zoony607-logo.png"
-  alt="Zoony607"
->
-
-</a>
-
-<div class="brand-note">
-Tap the Zoony607 logo to visit my YouTube channel
-</div>
+  <div class="brand-note">
+    Tap the Zoony607 logo to visit my YouTube channel
+  </div>
 
 </div>
 
-
-<!-- ADD MUSIC -->
 
 <section class="panel">
 
-<h1>
-Zoony607 Playlist Mixer
-</h1>
+  <h1>
+    Zoony607 Playlist Mixer
+  </h1>
 
-<p class="subtitle">
-Blend up to 15 songs into one continuous mix.
-Reorder your tracks, choose the crossfade length,
-preview the mix, then export it as MP3 or WAV.
-</p>
+  <p class="subtitle">
+    Blend up to 15 songs into one continuous mix.
+    Reorder your tracks, choose the crossfade length,
+    preview the mix, then export it as MP3 or WAV.
+  </p>
 
-<input
-  id="fileInput"
-  type="file"
-  accept="audio/*,.mp3,.m4a,.aac,.wav,.flac,.ogg"
-  multiple
-  hidden
->
+  <input
+    id="fileInput"
+    type="file"
+    accept="audio/*,.mp3,.m4a,.aac,.wav,.flac,.ogg"
+    multiple
+    hidden
+  >
 
-<div class="actions">
+  <div class="actions">
 
-<button
-  id="addBtn"
-  class="btn primary"
-  type="button"
->
-🎵 Add Songs
-</button>
+    <button
+      id="addBtn"
+      class="btn primary"
+      type="button"
+    >
+      🎵 Add Songs
+    </button>
 
-<button
-  id="clearBtn"
-  class="btn red"
-  type="button"
->
-Clear Playlist
-</button>
+    <button
+      id="clearBtn"
+      class="btn red"
+      type="button"
+    >
+      Clear Playlist
+    </button>
 
-</div>
+  </div>
 
-<div
-  id="loadStatus"
-  class="status"
->
-Choose 2–15 songs from Files.
-</div>
+  <div
+    id="loadStatus"
+    class="status"
+  >
+    Choose 2–15 songs from Files.
+  </div>
 
 </section>
 
 
-<!-- PLAYLIST -->
-
 <section class="panel">
 
-<div class="playlist-header">
+  <div class="playlist-header">
 
-<h2>
-Playlist
-</h2>
+    <h2>
+      Playlist
+    </h2>
 
-<div
-  id="trackCount"
-  class="count"
->
-0 / 15
-</div>
+    <div
+      id="trackCount"
+      class="count"
+    >
+      0 / 15
+    </div>
 
-</div>
+  </div>
 
-<div
-  id="trackList"
-  class="track-list"
->
-<div class="status">
-No songs loaded yet.
-</div>
-</div>
+  <div
+    id="trackList"
+    class="track-list"
+  >
+    <div class="status">
+      No songs loaded yet.
+    </div>
+  </div>
 
 </section>
 
 
-<!-- MIX SETTINGS -->
-
 <section class="panel">
 
-<h2>
-Mix Settings
-</h2>
+  <h2>
+    Mix Settings
+  </h2>
 
+  <div class="control-row">
 
-<div class="control-row">
+    <div class="label-row">
+      <span>Crossfade</span>
+      <span id="crossfadeValue">
+        8 seconds
+      </span>
+    </div>
 
-<div class="label-row">
+    <input
+      id="crossfade"
+      type="range"
+      min="0"
+      max="15"
+      value="8"
+      step="1"
+    >
 
-<span>
-Crossfade
-</span>
+  </div>
 
-<span id="crossfadeValue">
-8 seconds
-</span>
+  <div class="control-row">
 
-</div>
+    <div class="label-row">
+      <span>Master Level</span>
+      <span id="masterValue">
+        90%
+      </span>
+    </div>
 
-<input
-  id="crossfade"
-  type="range"
-  min="0"
-  max="15"
-  value="8"
-  step="1"
->
+    <input
+      id="master"
+      type="range"
+      min="20"
+      max="100"
+      value="90"
+      step="1"
+    >
 
-</div>
-
-
-<div class="control-row">
-
-<div class="label-row">
-
-<span>
-Master Level
-</span>
-
-<span id="masterValue">
-90%
-</span>
-
-</div>
-
-<input
-  id="master"
-  type="range"
-  min="20"
-  max="100"
-  value="90"
-  step="1"
->
-
-</div>
+  </div>
 
 </section>
 
 
-<!-- PREVIEW -->
-
 <section class="panel">
 
-<h2>
-Preview Continuous Mix
-</h2>
+  <h2>
+    Preview Continuous Mix
+  </h2>
 
-<div class="actions">
+  <div class="actions">
 
-<button
-  id="previewBtn"
-  class="btn primary"
-  type="button"
-  disabled
->
-▶ Preview Mix
-</button>
+    <button
+      id="previewBtn"
+      class="btn primary"
+      type="button"
+      disabled
+    >
+      ▶ Preview Mix
+    </button>
 
+    <button
+      id="stopBtn"
+      class="btn"
+      type="button"
+      disabled
+    >
+      ■ Stop
+    </button>
 
-<button
-  id="stopBtn"
-  class="btn"
-  type="button"
-  disabled
->
-■ Stop
-</button>
+  </div>
 
-</div>
-
-<div
-  id="nowPlaying"
-  class="now-playing"
->
-Add at least 2 songs to begin.
-</div>
+  <div
+    id="nowPlaying"
+    class="now-playing"
+  >
+    Add at least 2 songs to begin.
+  </div>
 
 </section>
 
 
-<!-- EXPORT -->
-
 <section class="panel">
 
-<h2>
-Export Finished Mix
-</h2>
+  <h2>
+    Export Finished Mix
+  </h2>
 
-<p class="subtitle">
-ZoonyMix will blend the tracks in playlist order
-using your selected crossfade setting.
-</p>
+  <p class="subtitle">
+    ZoonyMix will blend the tracks in playlist order
+    using your selected crossfade setting.
+  </p>
 
+  <div class="control-row">
 
-<div class="export-grid">
+    <div class="label-row">
+      <span>Mix Name</span>
+      <span>Type anything you want</span>
+    </div>
 
-<button
-  id="wavBtn"
-  class="btn green"
-  type="button"
-  disabled
->
-⬇ Save WAV
-</button>
+    <input
+      id="mixName"
+      class="text-input"
+      type="text"
+      value="Zoony607 Mix"
+      placeholder="Enter your mix name"
+      autocomplete="off"
+    >
 
-<button
-  id="mp3Btn"
-  class="btn green"
-  type="button"
-  disabled
->
-⬇ Save MP3
-</button>
+  </div>
 
-</div>
+  <div class="export-grid">
 
+    <button
+      id="wavBtn"
+      class="btn green"
+      type="button"
+      disabled
+    >
+      ⬇ Save WAV
+    </button>
 
-<div class="progress">
+    <button
+      id="mp3Btn"
+      class="btn green"
+      type="button"
+      disabled
+    >
+      ⬇ Save MP3
+    </button>
 
-<div
-  id="progressBar"
-  class="progress-bar"
-></div>
+  </div>
 
-</div>
+  <div class="progress">
+    <div
+      id="progressBar"
+      class="progress-bar"
+    ></div>
+  </div>
 
+  <div
+    id="exportStatus"
+    class="status"
+  >
+    Ready when at least 2 songs are loaded.
+  </div>
 
-<div
-  id="exportStatus"
-  class="status"
->
-Ready when at least 2 songs are loaded.
-</div>
-
-
-<div class="note">
-
-MP3 export is 192 kbps.
-
-For very long 10–15 song mixes,
-MP3 is recommended because WAV files
-can become extremely large and may use
-a lot of iPhone memory during rendering.
-
-</div>
+  <div class="note">
+    MP3 export is 192 kbps.
+    After rendering, ZoonyMix will try to open the iPhone Share Sheet.
+    Choose Save to Files to pick your folder.
+    You can also rename the file again in the iOS save screen.
+  </div>
 
 </section>
 
-
-<!-- SUPPORT -->
 
 <section class="panel support">
 
-<h2>
-Support Zoony607 ❤️
-</h2>
+  <h2>
+    Support Zoony607 ❤️
+  </h2>
 
-<p class="subtitle">
-Enjoying the mixer and music?
-Subscribe to Zoony607 or help support the channel.
-</p>
+  <p class="subtitle">
+    Enjoying the mixer and music?
+    Subscribe to Zoony607 or help support the channel.
+  </p>
 
-<div class="support-links">
+  <div class="support-links">
 
+    <a
+      class="support-link youtube"
+      href="https://www.youtube.com/@ZooNY607?sub_confirmation=1"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      ❤️ Subscribe to Zoony607 on YouTube
+    </a>
 
-<a
-  class="support-link youtube"
-  href="https://www.youtube.com/@ZooNY607?sub_confirmation=1"
-  target="_blank"
-  rel="noopener noreferrer"
->
-❤️ Subscribe to Zoony607 on YouTube
-</a>
+    <a
+      class="support-link cash"
+      href="https://cash.app/$Dchan99"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      ☕ Buy Me a Cup of Coffee — Cash App
+    </a>
 
+  </div>
 
-<a
-  class="support-link cash"
-  href="https://cash.app/$Dchan99"
-  target="_blank"
-  rel="noopener noreferrer"
->
-☕ Buy Me a Cup of Coffee — Cash App
-</a>
-
-
-</div>
-
-<div class="note">
-Cash App: $Dchan99
-</div>
+  <div class="note">
+    Cash App: $Dchan99
+  </div>
 
 </section>
-
 
 </main>
 
 
 <script>
-
 (() => {
 
 "use strict";
 
-
-/* ==================================
-   SETTINGS
-================================== */
-
 const MAX_TRACKS = 15;
-
-
-/* ==================================
-   ELEMENTS
-================================== */
 
 const fileInput =
 document.getElementById("fileInput");
@@ -900,17 +783,10 @@ document.getElementById("exportStatus");
 const progressBar =
 document.getElementById("progressBar");
 
-
-/* ==================================
-   PLAYLIST
-================================== */
+const mixName =
+document.getElementById("mixName");
 
 let tracks = [];
-
-
-/* ==================================
-   PREVIEW AUDIO
-================================== */
 
 const audioA =
 new Audio();
@@ -930,10 +806,6 @@ true;
 let fadeInterval =
 null;
 
-
-/* ==================================
-   HELPERS
-================================== */
 
 function escapeHtml(text) {
 
@@ -978,9 +850,27 @@ secondsLeft
 }
 
 
-/* ==================================
-   UPDATE BUTTONS
-================================== */
+function cleanFilename(name) {
+
+let cleaned =
+String(name || "")
+.trim();
+
+if (!cleaned) {
+cleaned =
+"Zoony607 Mix";
+}
+
+cleaned =
+cleaned.replace(
+/[\\/:*?"<>|]/g,
+"-"
+);
+
+return cleaned;
+
+}
+
 
 function updateControls() {
 
@@ -1004,15 +894,10 @@ mp3Btn.disabled =
 }
 
 
-/* ==================================
-   DRAW PLAYLIST
-================================== */
-
 function renderTracks() {
 
 trackList.innerHTML =
 "";
-
 
 if (!tracks.length) {
 
@@ -1029,7 +914,6 @@ return;
 
 }
 
-
 tracks.forEach(
 (track,index) => {
 
@@ -1040,7 +924,6 @@ document.createElement(
 
 item.className =
 "track";
-
 
 item.innerHTML =
 `
@@ -1058,7 +941,6 @@ ${escapeHtml(track.file.name)}
 </div>
 
 <div class="track-meta">
-
 ${
 track.duration
 ?
@@ -1066,13 +948,11 @@ formatTime(track.duration)
 :
 "Reading audio..."
 }
-
 </div>
 
 </div>
 
 </div>
-
 
 <div class="track-buttons">
 
@@ -1084,7 +964,6 @@ ${index === 0 ? "disabled" : ""}
 >
 ↑ Up
 </button>
-
 
 <button
 class="mini"
@@ -1101,7 +980,6 @@ index === tracks.length - 1
 ↓ Down
 </button>
 
-
 <button
 class="mini remove"
 data-action="remove"
@@ -1114,7 +992,6 @@ Remove
 
 `;
 
-
 trackList.appendChild(
 item
 );
@@ -1122,15 +999,10 @@ item
 }
 );
 
-
 updateControls();
 
 }
 
-
-/* ==================================
-   READ TRACK LENGTH
-================================== */
 
 function getDuration(file) {
 
@@ -1147,7 +1019,6 @@ new Audio();
 
 audio.preload =
 "metadata";
-
 
 audio.onloadedmetadata =
 () => {
@@ -1169,7 +1040,6 @@ duration
 
 };
 
-
 audio.onerror =
 () => {
 
@@ -1181,7 +1051,6 @@ resolve(0);
 
 };
 
-
 audio.src =
 url;
 
@@ -1190,10 +1059,6 @@ url;
 
 }
 
-
-/* ==================================
-   ADD SONGS
-================================== */
 
 addBtn.addEventListener(
 "click",
@@ -1217,16 +1082,13 @@ Array.from(
 fileInput.files || []
 );
 
-
 if (!selected.length) {
 return;
 }
 
-
 const available =
 MAX_TRACKS -
 tracks.length;
-
 
 if (available <= 0) {
 
@@ -1240,13 +1102,11 @@ return;
 
 }
 
-
 const accepted =
 selected.slice(
 0,
 available
 );
-
 
 accepted.forEach(
 file => {
@@ -1258,7 +1118,6 @@ duration:0
 
 }
 );
-
 
 loadStatus.textContent =
 "✅ Added " +
@@ -1275,7 +1134,6 @@ accepted.length === 1
 tracks.length +
 " total.";
 
-
 if (
 selected.length >
 available
@@ -1286,9 +1144,7 @@ loadStatus.textContent +=
 
 }
 
-
 renderTracks();
-
 
 for (
 const track
@@ -1307,17 +1163,12 @@ renderTracks();
 
 }
 
-
 fileInput.value =
 "";
 
 }
 );
 
-
-/* ==================================
-   REORDER / REMOVE
-================================== */
 
 trackList.addEventListener(
 "click",
@@ -1328,21 +1179,17 @@ event.target.closest(
 "button[data-action]"
 );
 
-
 if (!button) {
 return;
 }
-
 
 const index =
 Number(
 button.dataset.index
 );
 
-
 const action =
 button.dataset.action;
-
 
 if (
 action === "remove"
@@ -1354,7 +1201,6 @@ index,
 );
 
 }
-
 
 if (
 action === "up" &&
@@ -1372,7 +1218,6 @@ tracks[index - 1]
 ];
 
 }
-
 
 if (
 action === "down" &&
@@ -1392,16 +1237,11 @@ tracks[index + 1]
 
 }
 
-
 renderTracks();
 
 }
 );
 
-
-/* ==================================
-   CLEAR
-================================== */
 
 clearBtn.addEventListener(
 "click",
@@ -1423,10 +1263,6 @@ nowPlaying.textContent =
 }
 );
 
-
-/* ==================================
-   SETTINGS
-================================== */
 
 crossfade.addEventListener(
 "input",
@@ -1452,10 +1288,6 @@ master.value +
 );
 
 
-/* ==================================
-   AUDIO HELPERS
-================================== */
-
 function releaseAudio(audio) {
 
 audio.pause();
@@ -1465,7 +1297,6 @@ null;
 
 audio.onended =
 null;
-
 
 if (
 audio._blobURL
@@ -1479,7 +1310,6 @@ audio._blobURL =
 null;
 
 }
-
 
 audio.removeAttribute(
 "src"
@@ -1505,7 +1335,6 @@ audio._blobURL
 
 }
 
-
 const url =
 URL.createObjectURL(
 file
@@ -1521,10 +1350,6 @@ audio.load();
 
 }
 
-
-/* ==================================
-   STOP PREVIEW
-================================== */
 
 function stopPreview() {
 
@@ -1555,10 +1380,6 @@ tracks.length < 2;
 }
 
 
-/* ==================================
-   PREVIEW PLAYLIST
-================================== */
-
 async function playTrack(
 index,
 currentAudio,
@@ -1566,13 +1387,11 @@ nextAudio,
 alreadyPlaying = false
 ) {
 
-
 if (
 previewStopped
 ) {
 return;
 }
-
 
 if (
 index >=
@@ -1588,18 +1407,15 @@ return;
 
 }
 
-
 const masterGain =
 Number(
 master.value
 ) / 100;
 
-
 const fadeSeconds =
 Number(
 crossfade.value
 );
-
 
 if (
 !alreadyPlaying
@@ -1610,14 +1426,11 @@ currentAudio,
 tracks[index].file
 );
 
-
 currentAudio.currentTime =
 0;
 
-
 currentAudio.volume =
 masterGain;
-
 
 try {
 
@@ -1641,7 +1454,6 @@ return;
 
 }
 
-
 nowPlaying.textContent =
 "Now playing " +
 (index + 1) +
@@ -1650,14 +1462,11 @@ tracks.length +
 ": " +
 tracks[index].file.name;
 
-
 let nextStarted =
 false;
 
-
 currentAudio.ontimeupdate =
 async () => {
-
 
 if (
 previewStopped ||
@@ -1670,11 +1479,9 @@ return;
 
 }
 
-
 const remaining =
 currentAudio.duration -
 currentAudio.currentTime;
-
 
 if (
 !Number.isFinite(
@@ -1686,16 +1493,13 @@ return;
 
 }
 
-
 if (
 remaining <=
 fadeSeconds
 ) {
 
-
 nextStarted =
 true;
-
 
 loadAudio(
 nextAudio,
@@ -1704,10 +1508,8 @@ index + 1
 ].file
 );
 
-
 nextAudio.currentTime =
 0;
-
 
 nextAudio.volume =
 fadeSeconds > 0
@@ -1715,7 +1517,6 @@ fadeSeconds > 0
 0
 :
 masterGain;
-
 
 try {
 
@@ -1732,7 +1533,6 @@ return;
 
 }
 
-
 if (
 fadeSeconds <= 0
 ) {
@@ -1741,25 +1541,20 @@ return;
 
 }
 
-
 const start =
 performance.now();
-
 
 const fadeMilliseconds =
 fadeSeconds *
 1000;
 
-
 clearInterval(
 fadeInterval
 );
 
-
 fadeInterval =
 setInterval(
 () => {
-
 
 const progress =
 Math.min(
@@ -1771,7 +1566,6 @@ start
 fadeMilliseconds
 );
 
-
 currentAudio.volume =
 masterGain *
 (
@@ -1779,11 +1573,9 @@ masterGain *
 progress
 );
 
-
 nextAudio.volume =
 masterGain *
 progress;
-
 
 if (
 progress >= 1
@@ -1810,22 +1602,18 @@ null;
 currentAudio.onended =
 () => {
 
-
 currentAudio.ontimeupdate =
 null;
 
 currentAudio.onended =
 null;
 
-
 clearInterval(
 fadeInterval
 );
 
-
 fadeInterval =
 null;
-
 
 if (
 index ===
@@ -1841,17 +1629,14 @@ return;
 
 }
 
-
 if (
 nextStarted &&
 !nextAudio.paused
 ) {
 
-
 releaseAudio(
 currentAudio
 );
-
 
 playTrack(
 index + 1,
@@ -1863,11 +1648,9 @@ true
 }
 else {
 
-
 releaseAudio(
 currentAudio
 );
-
 
 playTrack(
 index + 1,
@@ -1883,14 +1666,9 @@ false
 }
 
 
-/* ==================================
-   START PREVIEW
-================================== */
-
 previewBtn.addEventListener(
 "click",
 () => {
-
 
 if (
 tracks.length < 2
@@ -1898,21 +1676,16 @@ tracks.length < 2
 return;
 }
 
-
 stopPreview();
-
 
 previewStopped =
 false;
 
-
 previewBtn.disabled =
 true;
 
-
 stopBtn.disabled =
 false;
-
 
 playTrack(
 0,
@@ -1937,10 +1710,6 @@ nowPlaying.textContent =
 );
 
 
-/* ==================================
-   EXPORT PROGRESS
-================================== */
-
 function setProgress(
 percent,
 message
@@ -1955,11 +1724,9 @@ percent
 )
 );
 
-
 progressBar.style.width =
 safe +
 "%";
-
 
 if (
 message
@@ -1973,24 +1740,17 @@ message;
 }
 
 
-/* ==================================
-   DECODE SONGS
-================================== */
-
 async function decodeTracks() {
 
 const Context =
 window.AudioContext ||
 window.webkitAudioContext;
 
-
 const context =
 new Context();
 
-
 const decoded =
 [];
-
 
 for (
 let index = 0;
@@ -1998,7 +1758,6 @@ index <
 tracks.length;
 index++
 ) {
-
 
 setProgress(
 (
@@ -2014,18 +1773,15 @@ tracks.length +
 tracks[index].file.name
 );
 
-
 const data =
 await tracks[
 index
 ].file.arrayBuffer();
 
-
 const buffer =
 await context.decodeAudioData(
 data.slice(0)
 );
-
 
 decoded.push(
 buffer
@@ -2033,58 +1789,43 @@ buffer
 
 }
 
-
 await context.close();
-
 
 return decoded;
 
 }
 
 
-/* ==================================
-   BUILD FINAL MIX
-================================== */
-
 async function renderMix() {
-
 
 const decoded =
 await decodeTracks();
 
-
 const sampleRate =
 44100;
-
 
 const fade =
 Number(
 crossfade.value
 );
 
-
 const masterGain =
 Number(
 master.value
 ) / 100;
 
-
 let totalSeconds =
 0;
-
 
 decoded.forEach(
 (buffer,index) => {
 
-
 totalSeconds +=
 buffer.duration;
-
 
 if (
 index > 0
 ) {
-
 
 totalSeconds -=
 Math.min(
@@ -2095,12 +1836,10 @@ index - 1
 buffer.duration
 );
 
-
 }
 
 }
 );
-
 
 const frames =
 Math.max(
@@ -2111,7 +1850,6 @@ sampleRate
 )
 );
 
-
 const offline =
 new OfflineAudioContext(
 2,
@@ -2119,26 +1857,20 @@ frames,
 sampleRate
 );
 
-
 let cursor =
 0;
-
 
 decoded.forEach(
 (buffer,index) => {
 
-
 const source =
 offline.createBufferSource();
-
 
 source.buffer =
 buffer;
 
-
 const gain =
 offline.createGain();
-
 
 source
 .connect(
@@ -2147,7 +1879,6 @@ gain
 .connect(
 offline.destination
 );
-
 
 const fadeIn =
 index === 0
@@ -2162,7 +1893,6 @@ index - 1
 buffer.duration
 );
 
-
 const start =
 Math.max(
 0,
@@ -2170,28 +1900,23 @@ cursor -
 fadeIn
 );
 
-
 if (
 index === 0 ||
 fadeIn <= 0
 ) {
-
 
 gain.gain.setValueAtTime(
 masterGain,
 start
 );
 
-
 }
 else {
-
 
 gain.gain.setValueAtTime(
 0,
 start
 );
-
 
 gain.gain.linearRampToValueAtTime(
 masterGain,
@@ -2199,15 +1924,12 @@ start +
 fadeIn
 );
 
-
 }
-
 
 if (
 index <
 decoded.length - 1
 ) {
-
 
 const fadeOut =
 Math.min(
@@ -2218,23 +1940,19 @@ index + 1
 ].duration
 );
 
-
 if (
 fadeOut > 0
 ) {
-
 
 const fadeOutStart =
 start +
 buffer.duration -
 fadeOut;
 
-
 gain.gain.setValueAtTime(
 masterGain,
 fadeOutStart
 );
-
 
 gain.gain.linearRampToValueAtTime(
 0,
@@ -2242,73 +1960,56 @@ start +
 buffer.duration
 );
 
-
 }
 
 }
-
 
 source.start(
 start
 );
 
-
 cursor =
 start +
 buffer.duration;
 
-
 }
 );
-
 
 setProgress(
 45,
 "Rendering continuous mix…"
 );
 
-
 const rendered =
 await offline.startRendering();
-
 
 setProgress(
 70,
 "Mix rendered. Preparing file…"
 );
 
-
 return rendered;
 
 }
 
 
-/* ==================================
-   WAV
-================================== */
-
 function makeWav(
 buffer
 ) {
 
-
 const channels =
 2;
-
 
 const sampleRate =
 buffer.sampleRate;
 
-
 const length =
 buffer.length;
-
 
 const dataSize =
 length *
 channels *
 2;
-
 
 const result =
 new ArrayBuffer(
@@ -2316,12 +2017,10 @@ new ArrayBuffer(
 dataSize
 );
 
-
 const view =
 new DataView(
 result
 );
-
 
 function write(
 offset,
@@ -2335,7 +2034,6 @@ text.length;
 index++
 ) {
 
-
 view.setUint8(
 offset +
 index,
@@ -2344,17 +2042,14 @@ index
 )
 );
 
-
 }
 
 }
-
 
 write(
 0,
 "RIFF"
 );
-
 
 view.setUint32(
 4,
@@ -2363,25 +2058,21 @@ dataSize,
 true
 );
 
-
 write(
 8,
 "WAVE"
 );
-
 
 write(
 12,
 "fmt "
 );
 
-
 view.setUint32(
 16,
 16,
 true
 );
-
 
 view.setUint16(
 20,
@@ -2389,20 +2080,17 @@ view.setUint16(
 true
 );
 
-
 view.setUint16(
 22,
 channels,
 true
 );
 
-
 view.setUint32(
 24,
 sampleRate,
 true
 );
-
 
 view.setUint32(
 28,
@@ -2412,7 +2100,6 @@ channels *
 true
 );
 
-
 view.setUint16(
 32,
 channels *
@@ -2420,19 +2107,16 @@ channels *
 true
 );
 
-
 view.setUint16(
 34,
 16,
 true
 );
 
-
 write(
 36,
 "data"
 );
-
 
 view.setUint32(
 40,
@@ -2440,12 +2124,10 @@ dataSize,
 true
 );
 
-
 const left =
 buffer.getChannelData(
 0
 );
-
 
 const right =
 buffer.numberOfChannels >
@@ -2457,10 +2139,8 @@ buffer.getChannelData(
 :
 left;
 
-
 let offset =
 44;
-
 
 for (
 let index = 0;
@@ -2468,7 +2148,6 @@ index <
 length;
 index++
 ) {
-
 
 const l =
 Math.max(
@@ -2479,7 +2158,6 @@ left[index]
 )
 );
 
-
 const r =
 Math.max(
 -1,
@@ -2488,7 +2166,6 @@ Math.min(
 right[index]
 )
 );
-
 
 view.setInt16(
 offset,
@@ -2502,10 +2179,8 @@ l *
 true
 );
 
-
 offset +=
 2;
-
 
 view.setInt16(
 offset,
@@ -2519,13 +2194,10 @@ r *
 true
 );
 
-
 offset +=
 2;
 
-
 }
-
 
 return new Blob(
 [result],
@@ -2537,20 +2209,14 @@ type:"audio/wav"
 }
 
 
-/* ==================================
-   MP3
-================================== */
-
 function floatTo16(
 array
 ) {
-
 
 const output =
 new Int16Array(
 array.length
 );
-
 
 for (
 let index = 0;
@@ -2558,7 +2224,6 @@ index <
 array.length;
 index++
 ) {
-
 
 const sample =
 Math.max(
@@ -2569,7 +2234,6 @@ array[index]
 )
 );
 
-
 output[index] =
 sample < 0
 ?
@@ -2579,9 +2243,7 @@ sample *
 sample *
 32767;
 
-
 }
-
 
 return output;
 
@@ -2592,23 +2254,18 @@ function makeMp3(
 buffer
 ) {
 
-
 if (
 !window.lamejs
 ) {
-
 
 throw new Error(
 "MP3 encoder did not load. Make sure the app has internet access and reload it."
 );
 
-
 }
-
 
 const sampleRate =
 buffer.sampleRate;
-
 
 const encoder =
 new lamejs.Mp3Encoder(
@@ -2617,14 +2274,12 @@ sampleRate,
 192
 );
 
-
 const left =
 floatTo16(
 buffer.getChannelData(
 0
 )
 );
-
 
 const right =
 floatTo16(
@@ -2640,14 +2295,11 @@ buffer.getChannelData(
 )
 );
 
-
 const block =
 1152;
 
-
 const parts =
 [];
-
 
 for (
 let index = 0;
@@ -2656,7 +2308,6 @@ left.length;
 index +=
 block
 ) {
-
 
 const encoded =
 encoder.encodeBuffer(
@@ -2672,11 +2323,9 @@ block
 )
 );
 
-
 if (
 encoded.length
 ) {
-
 
 parts.push(
 new Uint8Array(
@@ -2684,20 +2333,16 @@ encoded
 )
 );
 
-
 }
 
 }
-
 
 const end =
 encoder.flush();
 
-
 if (
 end.length
 ) {
-
 
 parts.push(
 new Uint8Array(
@@ -2705,9 +2350,7 @@ end
 )
 );
 
-
 }
-
 
 return new Blob(
 parts,
@@ -2719,15 +2362,10 @@ type:"audio/mpeg"
 }
 
 
-/* ==================================
-   SAVE TO IPHONE
-================================== */
-
 async function saveFile(
 blob,
 filename
 ) {
-
 
 const file =
 new File(
@@ -2739,7 +2377,6 @@ blob.type
 }
 );
 
-
 if (
 navigator.share &&
 navigator.canShare &&
@@ -2750,9 +2387,7 @@ file
 })
 ) {
 
-
 try {
-
 
 await navigator.share({
 files:[
@@ -2762,57 +2397,62 @@ title:
 filename
 });
 
+exportStatus.textContent =
+"✅ Share sheet opened. Choose Save to Files to pick your folder.";
 
 return;
-
 
 }
 catch(error) {
 
+if (
+error &&
+error.name ===
+"AbortError"
+) {
 
-console.log(
+exportStatus.textContent =
+"Save cancelled.";
+
+return;
+
+}
+
+console.error(
+"Share failed:",
 error
 );
 
-
 }
 
 }
-
-
-/* DOWNLOAD FALLBACK */
-
 
 const url =
 URL.createObjectURL(
 blob
 );
 
-
 const link =
 document.createElement(
 "a"
 );
 
-
 link.href =
 url;
 
-
 link.download =
 filename;
-
 
 document.body.appendChild(
 link
 );
 
-
 link.click();
-
 
 link.remove();
 
+exportStatus.textContent =
+"Saved using browser download because this browser did not allow the file Share Sheet.";
 
 setTimeout(
 () => {
@@ -2828,14 +2468,9 @@ url
 }
 
 
-/* ==================================
-   EXPORT
-================================== */
-
 async function exportMix(
 type
 ) {
-
 
 if (
 tracks.length < 2
@@ -2843,21 +2478,16 @@ tracks.length < 2
 return;
 }
 
-
 stopPreview();
-
 
 wavBtn.disabled =
 true;
 
-
 mp3Btn.disabled =
 true;
 
-
 previewBtn.disabled =
 true;
-
 
 setProgress(
 1,
@@ -2866,85 +2496,75 @@ type.toUpperCase() +
 " export…"
 );
 
-
 try {
-
 
 const mixed =
 await renderMix();
-
 
 let blob;
 
 let filename;
 
+const customName =
+cleanFilename(
+mixName.value
+);
 
 if (
 type === "wav"
 ) {
-
 
 setProgress(
 80,
 "Encoding WAV…"
 );
 
-
 blob =
 makeWav(
 mixed
 );
 
-
 filename =
-"Zoony607-Mix.wav";
-
+customName +
+".wav";
 
 }
 else {
-
 
 setProgress(
 80,
 "Encoding MP3 at 192 kbps…"
 );
 
-
 blob =
 makeMp3(
 mixed
 );
 
-
 filename =
-"Zoony607-Mix.mp3";
-
+customName +
+".mp3";
 
 }
-
 
 setProgress(
 100,
 "✅ " +
 filename +
-" is ready to save."
+" is ready."
 );
-
 
 await saveFile(
 blob,
 filename
 );
 
-
 }
 catch(error) {
-
 
 console.error(
 error
 );
-
 
 setProgress(
 0,
@@ -2955,31 +2575,22 @@ error
 )
 );
 
-
 }
 finally {
-
 
 wavBtn.disabled =
 tracks.length < 2;
 
-
 mp3Btn.disabled =
 tracks.length < 2;
-
 
 previewBtn.disabled =
 tracks.length < 2;
 
-
 }
 
 }
 
-
-/* ==================================
-   EXPORT BUTTONS
-================================== */
 
 wavBtn.addEventListener(
 "click",
@@ -3005,10 +2616,6 @@ exportMix(
 );
 
 
-/* ==================================
-   REOPEN FIX
-================================== */
-
 window.addEventListener(
 "pageshow",
 () => {
@@ -3020,17 +2627,11 @@ fileInput.value =
 );
 
 
-/* ==================================
-   INITIALIZE
-================================== */
-
 renderTracks();
 
 updateControls();
 
-
 })();
-
 </script>
 
 </body>
