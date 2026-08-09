@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#07111f" />
+  <title>Zoony Mix</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <style>
+    :root{
+      --bg:#050912; --panel:#0b1320; --panel2:#101b2b; --text:#f7f9fc;
+      --muted:#8da0b8; --blue:#16a3ff; --orange:#ff8a00; --line:#203149;
+      --danger:#ff4f63; --ok:#42d392;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; background:
+      radial-gradient(circle at 10% 0%, rgba(22,163,255,.16), transparent 35%),
+      radial-gradient(circle at 90% 0%, rgba(255,138,0,.14), transparent 30%),
+      var(--bg);
+      color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
+      min-height:100vh;
+    }
+    .wrap{max-width:900px;margin:0 auto;padding:24px 16px 40px}
+    header{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+    .logo{
+      width:58px;height:58px;border-radius:18px;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--blue),var(--orange));
+      box-shadow:0 10px 30px rgba(22,163,255,.18);
+      font-size:34px;font-weight:900;color:#08111c;
+    }
+    h1{font-size:28px;margin:0;letter-spacing:.2px}
+    .sub{color:var(--muted);margin-top:4px;font-size:14px}
+    .card{
+      background:linear-gradient(180deg,rgba(16,27,43,.96),rgba(11,19,32,.96));
+      border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:16px;
+      box-shadow:0 14px 34px rgba(0,0,0,.22);
+    }
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    button,.btn{
+      appearance:none;border:0;border-radius:14px;padding:13px 16px;
+      background:#18273b;color:var(--text);font-weight:700;font-size:15px;
+      cursor:pointer;text-align:center;
+    }
+    button.primary,.btn.primary{background:linear-gradient(135deg,var(--blue),#007ee7)}
+    button.orange{background:linear-gradient(135deg,var(--orange),#ff6400);color:#101010}
+    button.ghost{border:1px solid var(--line);background:transparent}
+    button.danger{background:#2a1117;color:#ff8d9a;border:1px solid #5a2630}
+    button:disabled{opacity:.45;cursor:not-allowed}
+    input[type=file]{display:none}
+    .filebtn{display:inline-block}
+    .tracks{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+    .track{
+      display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;
+      padding:12px;border:1px solid var(--line);border-radius:15px;background:#0c1726;
+    }
+    .num{
+      width:36px;height:36px;border-radius:12px;background:#10253c;color:var(--blue);
+      display:grid;place-items:center;font-weight:900;
+    }
+    .name{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .meta{font-size:12px;color:var(--muted);margin-top:3px}
+    .actions{display:flex;gap:6px}
+    .iconbtn{padding:9px 10px;border-radius:10px;font-size:14px}
+    .settings{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
+    label{font-weight:750}
+    .small{font-size:12px;color:var(--muted)}
+    input[type=range]{width:100%}
+    .status{
+      padding:12px 14px;border-radius:14px;background:#08121e;border:1px solid var(--line);
+      color:var(--muted);font-size:14px;margin-top:12px;
+    }
+    .status.ok{color:#baf6da;border-color:#235f48}
+    .status.err{color:#ffb2bb;border-color:#6c2a35}
+    .progress{
+      width:100%;height:10px;border-radius:999px;background:#142238;overflow:hidden;margin-top:10px;
+      border:1px solid #1f314a;
+    }
+    .progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--orange))}
+    .time{font-variant-numeric:tabular-nums}
+    .note{line-height:1.45;color:var(--muted);font-size:13px}
+    footer{text-align:center;color:#53657d;font-size:12px;margin-top:20px}
+    @media(max-width:600px){
+      .track{grid-template-columns:38px 1fr}
+      .actions{grid-column:1/-1;justify-content:flex-end}
+      .row>*{flex:1}
+      .row .filebtn{flex:1}
+      button,.btn{width:100%}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">Z</div>
+    <div>
+      <h1>Zoony Mix</h1>
+      <div class="sub">Local iPhone playlist mixer • crossfade • export WAV</div>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="row">
+      <label class="btn primary filebtn">
+        Add Songs
+        <input id="files" type="file" accept="audio/*" multiple>
+      </label>
+      <button id="clear" class="ghost">Clear List</button>
+    </div>
+    <div id="tracks" class="tracks"></div>
+    <div id="empty" class="status">Add MP3, M4A, AAC, or WAV files from the iPhone Files app.</div>
+  </div>
+
+  <div class="card">
+    <div class="settings">
+      <div>
+        <label for="xfade">Crossfade</label>
+        <div class="small">How long each song overlaps the next one.</div>
+      </div>
+      <strong><span id="xfadeVal">8</span>s</strong>
+    </div>
+    <input id="xfade" type="range" min="0" max="15" value="8" step="1">
+
+    <div class="settings" style="margin-top:18px">
+      <div>
+        <label for="gain">Master level</label>
+        <div class="small">Leave a little headroom to reduce clipping.</div>
+      </div>
+      <strong><span id="gainVal">90</span>%</strong>
+    </div>
+    <input id="gain" type="range" min="50" max="100" value="90" step="1">
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <button id="preview" class="orange" disabled>Preview Mix</button>
+      <button id="stop" class="ghost" disabled>Stop</button>
+      <button id="render" class="primary" disabled>Export WAV</button>
+    </div>
+    <div id="status" class="status">Add at least 2 songs to begin.</div>
+    <div class="progress"><div id="bar"></div></div>
+  </div>
+
+  <div class="card">
+    <div class="note">
+      <strong>How it works:</strong> Zoony Mix keeps your songs on your device. It decodes the files locally in Safari, overlaps each track by your crossfade amount, and can render the result as one WAV file. Nothing is uploaded.
+    </div>
+  </div>
+
+  <footer>Zoony Mix • private local mixer</footer>
+</div>
+
+<script>
+const state = { items: [], ctx: null, sources: [], stopTimer: null };
+
+const $ = s => document.querySelector(s);
+const filesInput = $('#files'), tracksEl = $('#tracks'), emptyEl = $('#empty');
+const xfade = $('#xfade'), gain = $('#gain'), statusEl = $('#status'), bar = $('#bar');
+const previewBtn = $('#preview'), stopBtn = $('#stop'), renderBtn = $('#render');
+
+xfade.oninput = () => $('#xfadeVal').textContent = xfade.value;
+gain.oninput = () => $('#gainVal').textContent = gain.value;
+
+function fmt(sec){
+  if (!isFinite(sec)) return '…';
+  const m=Math.floor(sec/60), s=Math.round(sec%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+function updateButtons(){
+  const ok = state.items.length >= 2;
+  previewBtn.disabled = !ok;
+  renderBtn.disabled = !ok;
+  emptyEl.style.display = state.items.length ? 'none' : 'block';
+}
+
+function renderList(){
+  tracksEl.innerHTML = '';
+  state.items.forEach((it, i)=>{
+    const el=document.createElement('div'); el.className='track';
+    el.innerHTML = `
+      <div class="num">${String(i+1).padStart(2,'0')}</div>
+      <div>
+        <div class="name">${it.file.name.replace(/\.[^/.]+$/,'')}</div>
+        <div class="meta">${it.buffer ? fmt(it.buffer.duration) : 'Analyzing…'} • ${(it.file.size/1024/1024).toFixed(1)} MB</div>
+      </div>
+      <div class="actions">
+        <button class="iconbtn" ${i===0?'disabled':''} data-act="up" data-i="${i}">↑</button>
+        <button class="iconbtn" ${i===state.items.length-1?'disabled':''} data-act="down" data-i="${i}">↓</button>
+        <button class="iconbtn danger" data-act="del" data-i="${i}">✕</button>
+      </div>`;
+    tracksEl.appendChild(el);
+  });
+  tracksEl.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i, act=b.dataset.act;
+    if(act==='del') state.items.splice(i,1);
+    if(act==='up' && i>0) [state.items[i-1],state.items[i]]=[state.items[i],state.items[i-1]];
+    if(act==='down' && i<state.items.length-1) [state.items[i+1],state.items[i]]=[state.items[i],state.items[i+1]];
+    renderList(); updateButtons();
+  });
+}
+
+async function audioCtx(){
+  if(!state.ctx) state.ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if(state.ctx.state==='suspended') await state.ctx.resume();
+  return state.ctx;
+}
+
+filesInput.onchange = async (e)=>{
+  const newFiles=[...e.target.files];
+  if(!newFiles.length) return;
+  statusEl.className='status'; statusEl.textContent='Analyzing songs…';
+  const ctx=await audioCtx();
+  for(const file of newFiles){
+    const item={file, buffer:null};
+    state.items.push(item);
+    renderList(); updateButtons();
+    try{
+      const arr=await file.arrayBuffer();
+      item.buffer=await ctx.decodeAudioData(arr.slice(0));
+    }catch(err){
+      item.error=true;
+      statusEl.className='status err';
+      statusEl.textContent=`Could not read ${file.name}. Try MP3, AAC/M4A, or WAV.`;
+    }
+    renderList();
+  }
+  const good=state.items.filter(x=>x.buffer);
+  state.items=good;
+  renderList(); updateButtons();
+  if(good.length>=2){
+    statusEl.className='status ok';
+    statusEl.textContent=`Ready: ${good.length} songs.`;
+  }
+  filesInput.value='';
+};
+
+$('#clear').onclick=()=>{
+  stopPreview();
+  state.items=[];
+  renderList(); updateButtons();
+  statusEl.className='status'; statusEl.textContent='Add at least 2 songs to begin.';
+  bar.style.width='0%';
+};
+
+function computeSchedule(buffers, fade){
+  const starts=[]; let t=0;
+  for(let i=0;i<buffers.length;i++){
+    starts.push(t);
+    t += buffers[i].duration;
+    if(i<buffers.length-1) t -= Math.min(fade, buffers[i].duration/2, buffers[i+1].duration/2);
+  }
+  return {starts,total:t};
+}
+
+function addFades(ctx, src, gainNode, start, dur, fade, isFirst, isLast, master){
+  const g=gainNode.gain;
+  const f=Math.min(fade, dur/2);
+  g.setValueAtTime(master, start);
+  if(!isFirst && f>0){
+    g.setValueAtTime(0, start);
+    g.linearRampToValueAtTime(master, start+f);
+  }
+  if(!isLast && f>0){
+    g.setValueAtTime(master, start+dur-f);
+    g.linearRampToValueAtTime(0, start+dur);
+  }
+}
+
+async function preview(){
+  stopPreview();
+  const ctx=await audioCtx();
+  const fade=+xfade.value, master=+gain.value/100;
+  const {starts,total}=computeSchedule(state.items.map(x=>x.buffer),fade);
+  const t0=ctx.currentTime+0.08;
+  state.sources=[];
+  state.items.forEach((it,i)=>{
+    const src=ctx.createBufferSource(), g=ctx.createGain();
+    src.buffer=it.buffer; src.connect(g); g.connect(ctx.destination);
+    addFades(ctx,src,g,t0+starts[i],it.buffer.duration,fade,i===0,i===state.items.length-1,master);
+    src.start(t0+starts[i]); state.sources.push(src);
+  });
+  previewBtn.disabled=true; stopBtn.disabled=false;
+  statusEl.className='status ok'; statusEl.textContent=`Previewing ${fmt(total)} mix…`;
+  const startWall=performance.now();
+  const tick=()=>{
+    const p=Math.min(1,(performance.now()-startWall)/(total*1000));
+    bar.style.width=(p*100)+'%';
+    if(p<1 && state.sources.length) requestAnimationFrame(tick);
+  }; tick();
+  state.stopTimer=setTimeout(()=>stopPreview(true), total*1000+300);
+}
+
+function stopPreview(finished=false){
+  state.sources.forEach(s=>{try{s.stop()}catch(e){}});
+  state.sources=[];
+  if(state.stopTimer) clearTimeout(state.stopTimer);
+  previewBtn.disabled=state.items.length<2; stopBtn.disabled=true;
+  if(!finished){
+    statusEl.className='status'; statusEl.textContent='Preview stopped.';
+  }else{
+    statusEl.className='status ok'; statusEl.textContent='Preview finished.';
+  }
+}
+previewBtn.onclick=preview;
+stopBtn.onclick=()=>stopPreview(false);
+
+function writeWavFromAudioBuffer(buffer){
+  const channels=buffer.numberOfChannels;
+  const rate=buffer.sampleRate;
+  const length=buffer.length;
+  const bytesPerSample=2;
+  const blockAlign=channels*bytesPerSample;
+  const out=new ArrayBuffer(44+length*blockAlign);
+  const view=new DataView(out);
+  let p=0;
+  const str=s=>{for(let i=0;i<s.length;i++)view.setUint8(p++,s.charCodeAt(i));};
+  str('RIFF'); view.setUint32(p,36+length*blockAlign,true); p+=4;
+  str('WAVE'); str('fmt '); view.setUint32(p,16,true); p+=4;
+  view.setUint16(p,1,true); p+=2; view.setUint16(p,channels,true); p+=2;
+  view.setUint32(p,rate,true); p+=4; view.setUint32(p,rate*blockAlign,true); p+=4;
+  view.setUint16(p,blockAlign,true); p+=2; view.setUint16(p,16,true); p+=2;
+  str('data'); view.setUint32(p,length*blockAlign,true); p+=4;
+  const data=[]; for(let c=0;c<channels;c++) data.push(buffer.getChannelData(c));
+  for(let i=0;i<length;i++){
+    for(let c=0;c<channels;c++){
+      let s=Math.max(-1,Math.min(1,data[c][i]));
+      s=s<0?s*0x8000:s*0x7fff;
+      view.setInt16(p,s,true); p+=2;
+    }
+  }
+  return new Blob([view],{type:'audio/wav'});
+}
+
+async function renderMix(){
+  stopPreview();
+  renderBtn.disabled=true; previewBtn.disabled=true;
+  try{
+    const fade=+xfade.value, master=+gain.value/100;
+    const buffers=state.items.map(x=>x.buffer);
+    const {starts,total}=computeSchedule(buffers,fade);
+    const sampleRate=Math.max(...buffers.map(b=>b.sampleRate));
+    const channels=Math.max(...buffers.map(b=>b.numberOfChannels));
+    const frames=Math.ceil(total*sampleRate);
+    statusEl.className='status'; statusEl.textContent=`Rendering ${fmt(total)} WAV locally…`;
+    bar.style.width='15%';
+    const off=new OfflineAudioContext(channels,frames,sampleRate);
+    state.items.forEach((it,i)=>{
+      const src=off.createBufferSource(), g=off.createGain();
+      src.buffer=it.buffer; src.connect(g); g.connect(off.destination);
+      addFades(off,src,g,starts[i],it.buffer.duration,fade,i===0,i===state.items.length-1,master);
+      src.start(starts[i]);
+    });
+    bar.style.width='35%';
+    const rendered=await off.startRendering();
+    bar.style.width='75%';
+    const blob=writeWavFromAudioBuffer(rendered);
+    bar.style.width='95%';
+
+    const filename='ZoonyMix.wav';
+    const file=new File([blob],filename,{type:'audio/wav'});
+    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+      statusEl.className='status ok'; statusEl.textContent='Mix rendered. Opening iPhone share sheet…';
+      bar.style.width='100%';
+      await navigator.share({files:[file],title:'Zoony Mix'});
+    }else{
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download=filename; a.textContent='Download ZoonyMix.wav';
+      a.className='btn primary'; a.style.display='inline-block'; a.style.marginTop='12px';
+      statusEl.innerHTML='Mix rendered. ';
+      statusEl.appendChild(a);
+      statusEl.className='status ok'; bar.style.width='100%';
+    }
+  }catch(err){
+    console.error(err);
+    statusEl.className='status err';
+    statusEl.textContent='Render failed. On iPhone, very large WAV projects may exceed Safari memory. Try MP3/M4A source files or fewer tracks.';
+    bar.style.width='0%';
+  }finally{
+    renderBtn.disabled=state.items.length<2;
+    previewBtn.disabled=state.items.length<2;
+  }
+}
+renderBtn.onclick=renderMix;
+updateButtons();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
