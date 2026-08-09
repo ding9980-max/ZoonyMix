@@ -2363,107 +2363,466 @@ type:"audio/mpeg"
 
 
 async function saveFile(
-blob,
-filename
+  blob,
+  filename
 ) {
 
-const file =
-new File(
-[blob],
-filename,
-{
-type:
-blob.type
-}
-);
+  const oldOverlay =
+    document.getElementById(
+      "zoonySaveOverlay"
+    );
 
-if (
-navigator.share &&
-navigator.canShare &&
-navigator.canShare({
-files:[
-file
-]
-})
-) {
+  if (oldOverlay) {
+    oldOverlay.remove();
+  }
 
-try {
 
-await navigator.share({
-files:[
-file
-],
-title:
-filename
-});
+  const fileType =
+    filename.toLowerCase().endsWith(".mp3")
+      ? "audio/mpeg"
+      : "audio/wav";
 
-exportStatus.textContent =
-"✅ Share sheet opened. Choose Save to Files to pick your folder.";
 
-return;
+  const file =
+    new File(
+      [blob],
+      filename,
+      {
+        type:
+          blob.type ||
+          fileType
+      }
+    );
 
-}
-catch(error) {
 
-if (
-error &&
-error.name ===
-"AbortError"
-) {
+  /*
+    IMPORTANT FOR IPHONE:
 
-exportStatus.textContent =
-"Save cancelled.";
+    The audio render can take long enough that Safari
+    forgets the original Save MP3 button tap.
 
-return;
+    iOS requires a NEW user tap before it will allow
+    the native Share Sheet.
 
-}
+    So after rendering finishes, we display this
+    Save to iPhone screen and the user taps once more.
+  */
 
-console.error(
-"Share failed:",
-error
-);
 
-}
+  const overlay =
+    document.createElement(
+      "div"
+    );
 
-}
 
-const url =
-URL.createObjectURL(
-blob
-);
+  overlay.id =
+    "zoonySaveOverlay";
 
-const link =
-document.createElement(
-"a"
-);
 
-link.href =
-url;
+  overlay.style.cssText =
+    `
+    position:fixed;
+    inset:0;
+    z-index:999999;
+    background:rgba(0,0,0,.88);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:
+      max(20px,env(safe-area-inset-top))
+      18px
+      max(20px,env(safe-area-inset-bottom));
+    `;
 
-link.download =
-filename;
 
-document.body.appendChild(
-link
-);
+  const card =
+    document.createElement(
+      "div"
+    );
 
-link.click();
 
-link.remove();
+  card.style.cssText =
+    `
+    width:min(520px,100%);
+    background:
+      linear-gradient(
+        180deg,
+        #101d30,
+        #08111d
+      );
+    border:
+      1px solid rgba(255,255,255,.14);
+    border-radius:24px;
+    padding:22px;
+    color:white;
+    text-align:center;
+    box-shadow:
+      0 25px 80px rgba(0,0,0,.55);
+    `;
 
-exportStatus.textContent =
-"Saved using browser download because this browser did not allow the file Share Sheet.";
 
-setTimeout(
-() => {
+  const title =
+    document.createElement(
+      "div"
+    );
 
-URL.revokeObjectURL(
-url
-);
 
-},
-60000
-);
+  title.textContent =
+    "Your mix is ready 🎵";
+
+
+  title.style.cssText =
+    `
+    font-size:1.35rem;
+    font-weight:900;
+    margin-bottom:10px;
+    `;
+
+
+  const name =
+    document.createElement(
+      "div"
+    );
+
+
+  name.textContent =
+    filename;
+
+
+  name.style.cssText =
+    `
+    color:#f5f7fb;
+    font-size:1rem;
+    font-weight:800;
+    overflow-wrap:anywhere;
+    margin-bottom:10px;
+    `;
+
+
+  const instructions =
+    document.createElement(
+      "div"
+    );
+
+
+  instructions.innerHTML =
+    `
+    Tap the button below.<br>
+    Then choose <strong>Save to Files</strong>
+    in the iPhone Share Sheet.<br><br>
+    You can choose
+    <strong>On My iPhone</strong>,
+    <strong>iCloud Drive</strong>,
+    Downloads, or another folder.
+    `;
+
+
+  instructions.style.cssText =
+    `
+    color:#aab5c5;
+    font-size:.92rem;
+    line-height:1.5;
+    margin-bottom:18px;
+    `;
+
+
+  const saveButton =
+    document.createElement(
+      "button"
+    );
+
+
+  saveButton.type =
+    "button";
+
+
+  saveButton.textContent =
+    "📁 Choose Where to Save";
+
+
+  saveButton.style.cssText =
+    `
+    width:100%;
+    min-height:58px;
+    border:0;
+    border-radius:16px;
+    color:white;
+    font-size:1rem;
+    font-weight:900;
+    background:
+      linear-gradient(
+        90deg,
+        #1ea7ff,
+        #ff7417
+      );
+    margin-bottom:10px;
+    `;
+
+
+  const cancelButton =
+    document.createElement(
+      "button"
+    );
+
+
+  cancelButton.type =
+    "button";
+
+
+  cancelButton.textContent =
+    "Cancel";
+
+
+  cancelButton.style.cssText =
+    `
+    width:100%;
+    min-height:50px;
+    border:
+      1px solid rgba(255,255,255,.12);
+    border-radius:15px;
+    color:white;
+    background:
+      rgba(255,255,255,.06);
+    font-size:.95rem;
+    font-weight:800;
+    `;
+
+
+  const message =
+    document.createElement(
+      "div"
+    );
+
+
+  message.style.cssText =
+    `
+    min-height:22px;
+    margin-top:12px;
+    color:#9ca9bb;
+    font-size:.82rem;
+    line-height:1.4;
+    `;
+
+
+  saveButton.addEventListener(
+    "click",
+    async () => {
+
+      saveButton.disabled =
+        true;
+
+
+      saveButton.textContent =
+        "Opening iPhone Share Sheet…";
+
+
+      message.textContent =
+        "";
+
+
+      try {
+
+
+        /*
+          iPhone / iPad / Safari
+        */
+
+        if (
+          typeof navigator.share ===
+          "function"
+        ) {
+
+
+          await navigator.share({
+            files:[
+              file
+            ],
+            title:
+              filename
+          });
+
+
+          exportStatus.textContent =
+            "✅ Share/Save completed for " +
+            filename;
+
+
+          overlay.remove();
+
+
+          return;
+
+        }
+
+
+        /*
+          Desktop browsers that support
+          the native Save As picker.
+        */
+
+        if (
+          "showSaveFilePicker"
+          in window
+        ) {
+
+
+          const extension =
+            filename
+            .toLowerCase()
+            .endsWith(".mp3")
+              ? ".mp3"
+              : ".wav";
+
+
+          const handle =
+            await window.showSaveFilePicker({
+              suggestedName:
+                filename
+            });
+
+
+          const writable =
+            await handle.createWritable();
+
+
+          await writable.write(
+            blob
+          );
+
+
+          await writable.close();
+
+
+          exportStatus.textContent =
+            "✅ Saved " +
+            filename;
+
+
+          overlay.remove();
+
+
+          return;
+
+        }
+
+
+        message.textContent =
+          "This browser cannot open the native file Share Sheet. Open ZoonyMix in Safari and try again.";
+
+
+      }
+      catch(error) {
+
+
+        console.error(
+          "Save/share error:",
+          error
+        );
+
+
+        if (
+          error &&
+          error.name ===
+          "AbortError"
+        ) {
+
+
+          message.textContent =
+            "Save cancelled. Tap Choose Where to Save to try again.";
+
+
+        }
+        else {
+
+
+          message.textContent =
+            "Could not open the Share Sheet. Make sure ZoonyMix is open in Safari.";
+
+
+        }
+
+
+      }
+      finally {
+
+
+        saveButton.disabled =
+          false;
+
+
+        saveButton.textContent =
+          "📁 Choose Where to Save";
+
+
+      }
+
+    }
+  );
+
+
+  cancelButton.addEventListener(
+    "click",
+    () => {
+
+
+      overlay.remove();
+
+
+      exportStatus.textContent =
+        filename +
+        " was created, but saving was cancelled.";
+
+
+    }
+  );
+
+
+  card.appendChild(
+    title
+  );
+
+
+  card.appendChild(
+    name
+  );
+
+
+  card.appendChild(
+    instructions
+  );
+
+
+  card.appendChild(
+    saveButton
+  );
+
+
+  card.appendChild(
+    cancelButton
+  );
+
+
+  card.appendChild(
+    message
+  );
+
+
+  overlay.appendChild(
+    card
+  );
+
+
+  document.body.appendChild(
+    overlay
+  );
+
+
+  exportStatus.textContent =
+    "✅ " +
+    filename +
+    " is ready. Tap Choose Where to Save.";
 
 }
 
