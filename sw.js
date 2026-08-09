@@ -1,4 +1,4 @@
-const CACHE = "zoonymix-v3";
+const CACHE = "zoonymix-v4";
 
 self.addEventListener("install", event => {
   self.skipWaiting();
@@ -14,32 +14,42 @@ self.addEventListener("activate", event => {
           }
         })
       )
-    )
+    ).then(() => self.clients.claim())
   );
-
-  self.clients.claim();
 });
 
 self.addEventListener("fetch", event => {
-  if (event.request.mode === "navigate") {
+  const request = event.request;
+
+  if (request.mode === "navigate") {
     event.respondWith(
-      fetch(event.request, { cache: "no-store" })
-        .catch(() => caches.match(event.request))
+      fetch(request)
+        .then(response => {
+          const copy = response.clone();
+
+          caches.open(CACHE).then(cache => {
+            cache.put(request, copy);
+          });
+
+          return response;
+        })
+        .catch(() => caches.match(request))
     );
+
     return;
   }
 
   event.respondWith(
-    fetch(event.request)
-      .then(response => {
+    caches.match(request).then(cached => {
+      return cached || fetch(request).then(response => {
         const copy = response.clone();
 
         caches.open(CACHE).then(cache => {
-          cache.put(event.request, copy);
+          cache.put(request, copy);
         });
 
         return response;
-      })
-      .catch(() => caches.match(event.request))
+      });
+    })
   );
 });
