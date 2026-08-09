@@ -1,4 +1,4 @@
-const CACHE = "zoonymix-v7";
+const CACHE = "zoonymix-v8";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
