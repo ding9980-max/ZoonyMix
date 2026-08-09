@@ -1505,33 +1505,22 @@ shareWav.onclick=async()=>{
 
   try{
 
-    if(
-      navigator.share&&
-      navigator.canShare&&
-      navigator.canShare({
-        files:[
-          state.renderedFile
-        ]
-      })
-    ){
+    const url = URL.createObjectURL(state.renderedFile);
 
-      await navigator.share({
-        files:[
-          state.renderedFile
-        ],
-        title:"Zoony Mix"
-      });
+const a = document.createElement("a");
+a.href = url;
+a.download = state.renderedFile.name || "ZoonyMix.wav";
 
-    }else{
+document.body.appendChild(a);
+a.click();
+a.remove();
 
-      status.className=
-        "status";
+setTimeout(() => {
+  URL.revokeObjectURL(url);
+}, 10000);
 
-      status.textContent=
-        "Sharing is unavailable here. Use Save WAV instead.";
-
-    }
-
+status.className = "status ok";
+status.textContent = "WAV ready. Check your Downloads.";
   }catch(error){
 
     if(error.name==="AbortError"){
