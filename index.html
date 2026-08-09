@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Zoony Mix">
+
 <title>Zoony Mix</title>
 
 <link rel="manifest" href="manifest.json">
@@ -35,7 +37,7 @@ body{
     var(--bg);
   color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  padding:20px 14px 35px;
+  padding:max(20px,env(safe-area-inset-top)) 14px max(35px,env(safe-area-inset-bottom));
 }
 
 .wrap{
@@ -51,20 +53,27 @@ header{
 }
 
 .logo{
-  width:74px;
-  height:74px;
+  width:78px;
+  height:78px;
   border-radius:22px;
-  display:grid;
-  place-items:center;
-  font-size:44px;
-  font-weight:900;
-  color:#07111f;
-  background:linear-gradient(145deg,#2cc8ff,#ff9d20);
+  overflow:hidden;
+  background:#0d1828;
+  border:1px solid var(--line);
+  box-shadow:0 14px 40px rgba(0,0,0,.28);
+  flex-shrink:0;
+}
+
+.logo img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
 }
 
 h1{
   margin:0;
   font-size:42px;
+  letter-spacing:-1.5px;
 }
 
 .sub{
@@ -87,7 +96,7 @@ h1{
   gap:12px;
 }
 
-button,.filebtn{
+button,.filebtn,.savebtn{
   border:0;
   border-radius:18px;
   padding:15px;
@@ -97,6 +106,8 @@ button,.filebtn{
   display:flex;
   justify-content:center;
   align-items:center;
+  text-decoration:none;
+  text-align:center;
 }
 
 button:disabled{
@@ -119,6 +130,11 @@ button:disabled{
   border:1px solid #263b57;
 }
 
+.green{
+  background:linear-gradient(135deg,#42d392,#1fa86c);
+  color:#06130e;
+}
+
 input[type=file]{
   display:none;
 }
@@ -136,11 +152,13 @@ input[type=file]{
 .status.ok{
   color:#cffff0;
   border-color:rgba(66,211,146,.45);
+  background:rgba(66,211,146,.07);
 }
 
 .status.err{
   color:#ffd5da;
   border-color:rgba(255,79,99,.45);
+  background:rgba(255,79,99,.07);
 }
 
 .setting{
@@ -231,6 +249,13 @@ input[type=range]{
   gap:10px;
 }
 
+.exportActions{
+  display:none;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:12px;
+}
+
 .progress{
   height:10px;
   margin-top:14px;
@@ -252,6 +277,12 @@ footer{
   color:#65758a;
   margin-top:22px;
 }
+
+@media(max-width:600px){
+  .exportActions{
+    grid-template-columns:1fr;
+  }
+}
 </style>
 </head>
 
@@ -260,10 +291,15 @@ footer{
 <div class="wrap">
 
 <header>
-  <div class="logo">Z</div>
+  <div class="logo">
+    <img src="icon.svg" alt="Zoony Mix Logo">
+  </div>
+
   <div>
     <h1>Zoony Mix</h1>
-    <div class="sub">Local iPhone playlist mixer • crossfade • export WAV</div>
+    <div class="sub">
+      Local iPhone playlist mixer • crossfade • export WAV
+    </div>
   </div>
 </header>
 
@@ -300,14 +336,12 @@ Select multiple MP3, M4A, AAC, or WAV files from Files.
 <div class="setting">
 
 <div class="settingTop">
-
 <div>
 <strong>Crossfade</strong>
 <div class="small">Overlap between songs.</div>
 </div>
 
 <strong><span id="fadeValue">8</span>s</strong>
-
 </div>
 
 <input id="fade" type="range" min="0" max="15" value="8">
@@ -317,14 +351,12 @@ Select multiple MP3, M4A, AAC, or WAV files from Files.
 <div class="setting">
 
 <div class="settingTop">
-
 <div>
 <strong>Master level</strong>
 <div class="small">Lower this if your mix clips.</div>
 </div>
 
 <strong><span id="gainValue">90</span>%</strong>
-
 </div>
 
 <input id="gain" type="range" min="50" max="100" value="90">
@@ -346,7 +378,23 @@ Stop
 </button>
 
 <button id="export" class="primary" disabled>
-Export WAV
+Render WAV
+</button>
+
+</div>
+
+<div id="exportActions" class="exportActions">
+
+<a
+id="saveWav"
+class="savebtn green"
+href="#"
+download="ZoonyMix.wav">
+Save WAV
+</a>
+
+<button id="shareWav" class="primary">
+Share WAV
 </button>
 
 </div>
@@ -385,7 +433,10 @@ Zoony Mix • private local mixer
 const state={
   songs:[],
   ctx:null,
-  sources:[]
+  sources:[],
+  renderedBlob:null,
+  renderedUrl:null,
+  renderedFile:null
 };
 
 const $=s=>document.querySelector(s);
@@ -400,6 +451,10 @@ const clear=$("#clear");
 const fade=$("#fade");
 const gain=$("#gain");
 const bar=$("#bar");
+
+const exportActions=$("#exportActions");
+const saveWav=$("#saveWav");
+const shareWav=$("#shareWav");
 
 fade.oninput=()=>{
   $("#fadeValue").textContent=fade.value;
@@ -438,7 +493,6 @@ function updateButtons(){
     usableSongs().length>=2;
 
   preview.disabled=!ready;
-
   exportBtn.disabled=!ready;
 }
 
@@ -466,8 +520,7 @@ function renderSongs(){
     }
 
     if(song.error){
-      details=
-        "Could not decode";
+      details="Could not decode";
     }
 
     div.innerHTML=`
@@ -519,8 +572,7 @@ function renderSongs(){
 
   });
 
-  tracks
-  .querySelectorAll("button")
+  tracks.querySelectorAll("button")
   .forEach(button=>{
 
     button.onclick=()=>{
@@ -532,9 +584,7 @@ function renderSongs(){
         button.dataset.action;
 
       if(action==="delete"){
-
         state.songs.splice(index,1);
-
       }
 
       if(action==="up"&&index>0){
@@ -546,7 +596,6 @@ function renderSongs(){
           state.songs[index],
           state.songs[index-1]
         ];
-
       }
 
       if(
@@ -561,11 +610,9 @@ function renderSongs(){
           state.songs[index],
           state.songs[index+1]
         ];
-
       }
 
       renderSongs();
-
       updateButtons();
 
     };
@@ -585,22 +632,14 @@ async function getAudioContext(){
     throw new Error(
       "Web Audio is unavailable."
     );
-
   }
 
   if(!state.ctx){
-
-    state.ctx=
-      new AudioContext();
-
+    state.ctx=new AudioContext();
   }
 
-  if(
-    state.ctx.state==="suspended"
-  ){
-
+  if(state.ctx.state==="suspended"){
     await state.ctx.resume();
-
   }
 
   return state.ctx;
@@ -614,66 +653,61 @@ function decodeAudio(
 
   return Promise.race([
 
-    new Promise(
-      (resolve,reject)=>{
+    new Promise((resolve,reject)=>{
 
-        try{
+      try{
 
-          const copy=
-            arrayBuffer.slice(0);
+        const copy=
+          arrayBuffer.slice(0);
 
-          const result=
-            ctx.decodeAudioData(
-              copy,
-              resolve,
-              reject
-            );
+        const result=
+          ctx.decodeAudioData(
+            copy,
+            resolve,
+            reject
+          );
 
-          if(
-            result&&
-            typeof result.then==="function"
-          ){
+        if(
+          result&&
+          typeof result.then==="function"
+        ){
 
-            result
-            .then(resolve)
-            .catch(reject);
-
-          }
+          result
+          .then(resolve)
+          .catch(reject);
 
         }
 
-        catch(error){
+      }catch(error){
 
-          reject(error);
-
-        }
+        reject(error);
 
       }
-    ),
 
-    new Promise(
-      (_,reject)=>{
+    }),
 
-        setTimeout(
-          ()=>reject(
-            new Error(
-              "Audio decode timeout"
-            )
-          ),
-          timeout
-        );
+    new Promise((_,reject)=>{
 
-      }
-    )
+      setTimeout(
+        ()=>reject(
+          new Error(
+            "Audio decode timeout"
+          )
+        ),
+        timeout
+      );
+
+    })
 
   ]);
-
 }
 
 files.onchange=async event=>{
 
   const selected=
-    Array.from(event.target.files||[]);
+    Array.from(
+      event.target.files||[]
+    );
 
   files.value="";
 
@@ -688,9 +722,7 @@ files.onchange=async event=>{
     ctx=
       await getAudioContext();
 
-  }
-
-  catch(error){
+  }catch(error){
 
     status.className=
       "status err";
@@ -702,7 +734,6 @@ files.onchange=async event=>{
   }
 
   let success=0;
-
   let failed=0;
 
   for(
@@ -751,12 +782,9 @@ files.onchange=async event=>{
 
       success++;
 
-    }
-
-    catch(error){
+    }catch(error){
 
       song.loading=false;
-
       song.error=true;
 
       failed++;
@@ -769,7 +797,6 @@ files.onchange=async event=>{
     }
 
     renderSongs();
-
     updateButtons();
 
   }
@@ -787,9 +814,7 @@ files.onchange=async event=>{
         ? ` • ${failed} could not be decoded`
         : "");
 
-  }
-
-  else{
+  }else{
 
     status.className=
       "status err";
@@ -807,8 +832,9 @@ clear.onclick=()=>{
 
   state.songs=[];
 
-  renderSongs();
+  clearRenderedMix();
 
+  renderSongs();
   updateButtons();
 
   bar.style.width="0%";
@@ -817,10 +843,12 @@ clear.onclick=()=>{
 
   status.textContent=
     "Add at least 2 songs to begin.";
-
 };
 
-function schedule(buffers,crossfade){
+function schedule(
+  buffers,
+  crossfade
+){
 
   const starts=[];
 
@@ -843,9 +871,7 @@ function schedule(buffers,crossfade){
         current+=
           buffer.duration-overlap;
 
-      }
-
-      else{
+      }else{
 
         current+=
           buffer.duration;
@@ -863,14 +889,15 @@ function schedule(buffers,crossfade){
 
 function stopPreview(){
 
-  state.sources.forEach(source=>{
+  state.sources.forEach(
+    source=>{
 
-    try{
-      source.stop();
+      try{
+        source.stop();
+      }catch{}
+
     }
-    catch{}
-
-  });
+  );
 
   state.sources=[];
 
@@ -963,16 +990,13 @@ preview.onclick=async()=>{
             start+fadeTime
           );
 
-        }
-
-        else{
+        }else{
 
           gainNode.gain
           .setValueAtTime(
             master,
             start
           );
-
         }
 
         if(
@@ -1013,9 +1037,7 @@ preview.onclick=async()=>{
     status.textContent=
       `Previewing ${songs.length} songs`;
 
-  }
-
-  catch(error){
+  }catch(error){
 
     status.className=
       "status err";
@@ -1036,7 +1058,6 @@ stop.onclick=()=>{
 
   status.textContent=
     "Preview stopped.";
-
 };
 
 function writeWav(buffer){
@@ -1076,9 +1097,7 @@ function writeWav(buffer){
         pos++,
         value.charCodeAt(i)
       );
-
     }
-
   }
 
   text("RIFF");
@@ -1176,7 +1195,6 @@ function writeWav(buffer){
     data.push(
       buffer.getChannelData(c)
     );
-
   }
 
   for(
@@ -1202,8 +1220,8 @@ function writeWav(buffer){
 
       sample=
         sample<0
-        ?sample*0x8000
-        :sample*0x7fff;
+        ? sample*0x8000
+        : sample*0x7fff;
 
       view.setInt16(
         pos,
@@ -1212,14 +1230,33 @@ function writeWav(buffer){
       );
 
       pos+=2;
-
     }
-
   }
 
   return new Blob(
     [view],
     {type:"audio/wav"}
+  );
+}
+
+function clearRenderedMix(){
+
+  if(state.renderedUrl){
+
+    URL.revokeObjectURL(
+      state.renderedUrl
+    );
+  }
+
+  state.renderedBlob=null;
+  state.renderedUrl=null;
+  state.renderedFile=null;
+
+  exportActions.style.display=
+    "none";
+
+  saveWav.removeAttribute(
+    "href"
   );
 }
 
@@ -1236,14 +1273,15 @@ exportBtn.onclick=async()=>{
 
     stopPreview();
 
-    exportBtn.disabled=true;
+    clearRenderedMix();
 
+    exportBtn.disabled=true;
     preview.disabled=true;
 
     status.className="status";
 
     status.textContent=
-      "Rendering mix…";
+      "Rendering WAV…";
 
     bar.style.width="10%";
 
@@ -1287,6 +1325,13 @@ exportBtn.onclick=async()=>{
     const Offline=
       window.OfflineAudioContext||
       window.webkitOfflineAudioContext;
+
+    if(!Offline){
+
+      throw new Error(
+        "Offline WAV rendering is unavailable."
+      );
+    }
 
     const offline=
       new Offline(
@@ -1344,16 +1389,13 @@ exportBtn.onclick=async()=>{
             start+fadeTime
           );
 
-        }
-
-        else{
+        }else{
 
           gainNode.gain
           .setValueAtTime(
             master,
             start
           );
-
         }
 
         if(
@@ -1392,71 +1434,39 @@ exportBtn.onclick=async()=>{
     const blob=
       writeWav(rendered);
 
-    const file=
+    state.renderedBlob=
+      blob;
+
+    state.renderedUrl=
+      URL.createObjectURL(blob);
+
+    state.renderedFile=
       new File(
         [blob],
         "ZoonyMix.wav",
-        {type:"audio/wav"}
+        {
+          type:"audio/wav"
+        }
       );
+
+    saveWav.href=
+      state.renderedUrl;
+
+    saveWav.download=
+      "ZoonyMix.wav";
+
+    exportActions.style.display=
+      "grid";
 
     bar.style.width="100%";
 
-    if(
-      navigator.share&&
-      navigator.canShare&&
-      navigator.canShare({
-        files:[file]
-      })
-    ){
+    status.className=
+      "status ok";
 
-      status.className=
-        "status ok";
+    status.textContent=
+      "Mix complete ✅ Tap Save WAV or Share WAV below.";
 
-      status.textContent=
-        "Mix complete. Choose where to save it.";
-
-      await navigator.share({
-        files:[file],
-        title:"Zoony Mix"
-      });
-
-    }
-
-    else{
-
-      const url=
-        URL.createObjectURL(
-          blob
-        );
-
-      const link=
-        document.createElement(
-          "a"
-        );
-
-      link.href=url;
-
-      link.download=
-        "ZoonyMix.wav";
-
-      link.click();
-
-      setTimeout(
-        ()=>URL.revokeObjectURL(url),
-        60000
-      );
-
-      status.className=
-        "status ok";
-
-      status.textContent=
-        "ZoonyMix.wav downloaded.";
-
-    }
-
-  }
-
-  catch(error){
+  }catch(error){
 
     console.error(error);
 
@@ -1472,9 +1482,7 @@ exportBtn.onclick=async()=>{
 
     bar.style.width="0%";
 
-  }
-
-  finally{
+  }finally{
 
     updateButtons();
 
@@ -1482,8 +1490,64 @@ exportBtn.onclick=async()=>{
 
 };
 
-renderSongs();
+shareWav.onclick=async()=>{
 
+  if(!state.renderedFile){
+
+    status.className=
+      "status err";
+
+    status.textContent=
+      "Render the mix first.";
+
+    return;
+  }
+
+  try{
+
+    if(
+      navigator.share&&
+      navigator.canShare&&
+      navigator.canShare({
+        files:[
+          state.renderedFile
+        ]
+      })
+    ){
+
+      await navigator.share({
+        files:[
+          state.renderedFile
+        ],
+        title:"Zoony Mix"
+      });
+
+    }else{
+
+      status.className=
+        "status";
+
+      status.textContent=
+        "Sharing is unavailable here. Use Save WAV instead.";
+
+    }
+
+  }catch(error){
+
+    if(error.name==="AbortError"){
+      return;
+    }
+
+    status.className=
+      "status err";
+
+    status.textContent=
+      "Share failed. Use Save WAV instead.";
+  }
+
+};
+
+renderSongs();
 updateButtons();
 
 </script>
