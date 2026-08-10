@@ -3236,37 +3236,12 @@ masterValue.textContent =
 
 
 </script>
+
+<script src="https://counterapi.com/c.js?ns=ding9980-max.github.io" async></script>
+
 <div style="text-align:center;margin:24px 0 12px;color:#9ca9bb;font-size:14px;">
-  👥 ZoonyMix Visitors: <span id="zoonyVisits">Loading...</span>
+  👥 ZoonyMix Visitors:
+  <span class="counterapi"></span>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/counterapi/dist/counter.browser.min.js"></script>
-
-<script>
-document.addEventListener("DOMContentLoaded", async function () {
-  const display = document.getElementById("zoonyVisits");
-
-  try {
-    const counter = new Counter({
-      version: "v1",
-      namespace: "zoonymix-ding9980-max"
-    });
-
-    let result;
-
-    if (!localStorage.getItem("zoonyMixCounted")) {
-      result = await counter.up("visitors");
-      localStorage.setItem("zoonyMixCounted", "yes");
-    } else {
-      result = await counter.get("visitors");
-    }
-
-    display.textContent = result.value;
-  } catch (error) {
-    display.textContent = "—";
-    console.error("ZoonyMix visitor counter:", error);
-  }
-});
-</script>
 </body>
 </html>
