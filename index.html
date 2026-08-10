@@ -3235,26 +3235,40 @@ masterValue.textContent =
   "%";
 
 </script>
-<div style="
-  text-align:center;
-  margin-top:24px;
-  margin-bottom:12px;
-  color:#9ca9bb;
-  font-size:14px;
-">
-  👥 ZoonyMix Visits:
-  <span id="zoonyVisits">Loading...</span>
+
+<div style="text-align:center;margin:24px 0 12px;color:#9ca9bb;font-size:14px;">
+  👥 ZoonyMix Visitors: <span id="zoonyVisits">Loading...</span>
 </div>
 
 <script>
-fetch("https://api.counterapi.dev/v1/zoonymix/visits/up")
-  .then(response => response.json())
-  .then(data => {
-    document.getElementById("zoonyVisits").textContent = data.count;
-  })
-  .catch(() => {
-    document.getElementById("zoonyVisits").textContent = "—";
-  });
+const counterKey = "zoonyMixCounted";
+
+async function updateZoonyCounter() {
+  const display = document.getElementById("zoonyVisits");
+
+  try {
+    let url;
+
+    if (!localStorage.getItem(counterKey)) {
+      url = "https://api.counterapi.dev/v1/zoonymix/visitors/up";
+    } else {
+      url = "https://api.counterapi.dev/v1/zoonymix/visitors";
+    }
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    display.textContent = data.count;
+
+    if (!localStorage.getItem(counterKey)) {
+      localStorage.setItem(counterKey, "yes");
+    }
+  } catch (error) {
+    display.textContent = "—";
+  }
+}
+
+updateZoonyCounter();
 </script>
 </body>
 </html>
