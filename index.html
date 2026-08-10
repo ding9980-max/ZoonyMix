@@ -3234,47 +3234,39 @@ masterValue.textContent =
   master.value +
   "%";
 
+
 </script>
-
 <div style="text-align:center;margin:24px 0 12px;color:#9ca9bb;font-size:14px;">
   👥 ZoonyMix Visitors: <span id="zoonyVisits">Loading...</span>
 </div>
 
-<script>
-<div style="text-align:center;margin:24px 0 12px;color:#9ca9bb;font-size:14px;">
-  👥 ZoonyMix Visitors: <span id="zoonyVisits">Loading...</span>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/counterapi/dist/counter.browser.min.js"></script>
 
 <script>
-const counterKey = "zoonyMixCounted";
-
-async function updateZoonyCounter() {
+document.addEventListener("DOMContentLoaded", async function () {
   const display = document.getElementById("zoonyVisits");
 
   try {
-    let url;
+    const counter = new Counter({
+      version: "v1",
+      namespace: "zoonymix-ding9980-max"
+    });
 
-    if (!localStorage.getItem(counterKey)) {
-      url = "https://api.counterapi.dev/v1/zoonymix/visitors/up";
+    let result;
+
+    if (!localStorage.getItem("zoonyMixCounted")) {
+      result = await counter.up("visitors");
+      localStorage.setItem("zoonyMixCounted", "yes");
     } else {
-      url = "https://api.counterapi.dev/v1/zoonymix/visitors";
+      result = await counter.get("visitors");
     }
 
-    const response = await fetch(url);
-    const data = await response.json();
-
-    display.textContent = data.value;
-
-    if (!localStorage.getItem(counterKey)) {
-      localStorage.setItem(counterKey, "yes");
-    }
+    display.textContent = result.value;
   } catch (error) {
     display.textContent = "—";
+    console.error("ZoonyMix visitor counter:", error);
   }
-}
-
-updateZoonyCounter();
+});
 </script>
-
 </body>
 </html>
