@@ -3235,6 +3235,26 @@ masterValue.textContent =
   "%";
 
 </script>
+<div style="
+  text-align:center;
+  margin-top:24px;
+  margin-bottom:12px;
+  color:#9ca9bb;
+  font-size:14px;
+">
+  👥 ZoonyMix Visits:
+  <span id="zoonyVisits">Loading...</span>
+</div>
 
+<script>
+fetch("https://api.counterapi.dev/v1/zoonymix/visits/up")
+  .then(response => response.json())
+  .then(data => {
+    document.getElementById("zoonyVisits").textContent = data.count;
+  })
+  .catch(() => {
+    document.getElementById("zoonyVisits").textContent = "—";
+  });
+</script>
 </body>
 </html>
